@@ -14,7 +14,7 @@ module.exports = {
 		// Resolve the @wordpress packages this plugin imports to their built
 		// CommonJS output — some package.json entry fields would otherwise
 		// point Jest at untranspiled TypeScript sources.
-		'^@wordpress/(api-fetch|block-editor|blocks|components|compose|data|dom-ready|editor|element|hooks|html-entities|i18n|notices|plugins|url)$':
+		'^@wordpress/(api-fetch|block-editor|blocks|components|compose|data|dom-ready|editor|element|hooks|html-entities|i18n|notices|plugins|rich-text|url)$':
 			'<rootDir>/node_modules/@wordpress/$1/build/index.cjs',
 	},
 	// Some dependencies ship untransformed ESM: uuid (nested under

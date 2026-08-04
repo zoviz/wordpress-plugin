@@ -10,6 +10,9 @@
  * @property {?Object} source    { attachmentId, url, title } or null.
  * @property {?Object} target    { type: 'block', clientId } |
  *                               { type: 'featured' } | null (insert new).
+ * @property {?Object} values    Scalar field values to prefill the service
+ *                               form with (e.g. { prompt } from selected
+ *                               text) or null.
  */
 
 let listener = null;

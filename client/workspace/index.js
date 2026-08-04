@@ -5,7 +5,12 @@
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Flex, FlexItem, Spinner } from '@wordpress/components';
 import domReady from '@wordpress/dom-ready';
-import { createRoot, useEffect, useState } from '@wordpress/element';
+import {
+	createRoot,
+	useCallback,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getQueryArg } from '@wordpress/url';
 
@@ -21,19 +26,52 @@ import {
 	ServiceForm,
 	scalarFieldsComplete,
 } from '../shared/components/service-form';
+import { SketchCanvas } from '../shared/components/sketch-canvas';
 import { SourcePicker } from '../shared/components/source-picker';
 import { serviceIcon } from '../shared/service-icons';
 import { useServices } from '../shared/hooks/use-services';
 
-function WorkspaceApp() {
+export function WorkspaceApp() {
 	const { services, isLoading } = useServices();
 
 	const [ serviceId, setServiceId ] = useState(
 		getQueryArg( window.location.href, 'service' ) || ''
 	);
-	const [ source, setSource ] = useState( null );
-	const [ mask, setMask ] = useState( null );
-	const [ values, setValues ] = useState( {} );
+
+	// Each service keeps its own source/mask/values so switching tools never
+	// leaks one service's picked image (or sketch, or field values) into
+	// another's.
+	const [ sourceByService, setSourceByService ] = useState( {} );
+	const [ maskByService, setMaskByService ] = useState( {} );
+	const [ valuesByService, setValuesByService ] = useState( {} );
+	const source = sourceByService[ serviceId ] || null;
+	const mask = maskByService[ serviceId ] || null;
+	const values = valuesByService[ serviceId ] || {};
+	const setSource = useCallback(
+		( next ) =>
+			setSourceByService( ( prev ) => ( {
+				...prev,
+				[ serviceId ]: next,
+			} ) ),
+		[ serviceId ]
+	);
+	const setMask = useCallback(
+		( next ) =>
+			setMaskByService( ( prev ) => ( {
+				...prev,
+				[ serviceId ]: next,
+			} ) ),
+		[ serviceId ]
+	);
+	const setValues = useCallback(
+		( next ) =>
+			setValuesByService( ( prev ) => ( {
+				...prev,
+				[ serviceId ]: next,
+			} ) ),
+		[ serviceId ]
+	);
+
 	const [ keyId, setKeyId ] = useState( '' );
 	const [ jobId, setJobId ] = useState( 0 );
 	const [ submitError, setSubmitError ] = useState( null );
@@ -60,6 +98,9 @@ function WorkspaceApp() {
 				} )
 			)
 			.catch( () => {} );
+		// Intentionally mount-only: the deep link targets whichever service
+		// was preselected via the `service` query arg at load time.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	if ( isLoading ) {
@@ -69,12 +110,11 @@ function WorkspaceApp() {
 	const service =
 		( services || [] ).find( ( entry ) => entry.id === serviceId ) || null;
 	const needsSource = service && service.capabilities.source !== 'none';
+	const needsSketch = service && service.capabilities.source === 'sketch';
 	const needsMask = service && service.capabilities.mask;
 
 	const selectService = ( id ) => {
 		setServiceId( id );
-		setMask( null );
-		setValues( {} );
 		setJobId( 0 );
 		setSubmitError( null );
 	};
@@ -176,7 +216,16 @@ function WorkspaceApp() {
 								{ service.description }
 							</p>
 
-							{ needsSource && (
+							{ needsSource && needsSketch && (
+								<SketchCanvas
+									onChange={ ( next ) => {
+										setSource( next );
+										setJobId( 0 );
+									} }
+								/>
+							) }
+
+							{ needsSource && ! needsSketch && (
 								<SourcePicker
 									source={ source }
 									onChange={ ( next ) => {
@@ -191,6 +240,9 @@ function WorkspaceApp() {
 								<MaskCanvas
 									imageUrl={ source.url }
 									onMaskChange={ setMask }
+									defaultBrushSize={
+										service.id === 'image-editor' ? 10 : 40
+									}
 								/>
 							) }
 

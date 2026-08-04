@@ -11,14 +11,18 @@ import { __ } from '@wordpress/i18n';
 const MAX_UNDO = 20;
 const OVERLAY = 'rgba(233, 30, 99, 0.55)'; // Display-only tint; export is white.
 
-export function MaskCanvas( { imageUrl, onMaskChange } ) {
+export function MaskCanvas( {
+	imageUrl,
+	onMaskChange,
+	defaultBrushSize = 40,
+} ) {
 	const displayRef = useRef( null );
 	const maskRef = useRef( document.createElement( 'canvas' ) );
 	const imageRef = useRef( null );
 	const undoStack = useRef( [] );
 	const painting = useRef( false );
 
-	const [ brushSize, setBrushSize ] = useState( 40 );
+	const [ brushSize, setBrushSize ] = useState( defaultBrushSize );
 	const [ mode, setMode ] = useState( 'brush' );
 	const [ hasStrokes, setHasStrokes ] = useState( false );
 	const [ ready, setReady ] = useState( false );

@@ -23,6 +23,10 @@ const QUICK_ACTIONS = [
 		label: __( 'Remove Object', 'zoviz-ai-studio' ),
 	},
 	{ service: 'image-upscaler', label: __( 'Upscale', 'zoviz-ai-studio' ) },
+	{
+		service: 'product-photography',
+		label: __( 'Product Photography', 'zoviz-ai-studio' ),
+	},
 ];
 
 export const withZovizBlockControls = createHigherOrderComponent(

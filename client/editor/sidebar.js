@@ -34,6 +34,7 @@ import {
 	ServiceForm,
 	scalarFieldsComplete,
 } from '../shared/components/service-form';
+import { SketchCanvas } from '../shared/components/sketch-canvas';
 import { SourcePicker } from '../shared/components/source-picker';
 import { useServices } from '../shared/hooks/use-services';
 import { serviceIcon } from '../shared/service-icons';
@@ -79,7 +80,7 @@ function ZovizSidebarBody() {
 			setServiceId( request.serviceId || '' );
 			setSource( request.source || null );
 			setMask( null );
-			setValues( {} );
+			setValues( request.values || {} );
 			setJobId( 0 );
 			setSubmitError( null );
 			setTarget( request.target || null );
@@ -94,6 +95,7 @@ function ZovizSidebarBody() {
 	const service =
 		( services || [] ).find( ( entry ) => entry.id === serviceId ) || null;
 	const needsSource = service && service.capabilities.source !== 'none';
+	const needsSketch = service && service.capabilities.source === 'sketch';
 	const needsMask = service && service.capabilities.mask;
 
 	const selectService = ( id ) => {
@@ -216,7 +218,16 @@ function ZovizSidebarBody() {
 					<>
 						<p className="description">{ service.description }</p>
 
-						{ needsSource && (
+						{ needsSource && needsSketch && (
+							<SketchCanvas
+								onChange={ ( next ) => {
+									setSource( next );
+									setJobId( 0 );
+								} }
+							/>
+						) }
+
+						{ needsSource && ! needsSketch && (
 							<SourcePicker
 								source={ source }
 								onChange={ ( next ) => {
@@ -231,6 +242,9 @@ function ZovizSidebarBody() {
 							<MaskCanvas
 								imageUrl={ source.url }
 								onMaskChange={ setMask }
+								defaultBrushSize={
+									service.id === 'image-editor' ? 10 : 40
+								}
 							/>
 						) }
 
