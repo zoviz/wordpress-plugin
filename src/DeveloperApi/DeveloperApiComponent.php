@@ -11,6 +11,7 @@ use Zoviz\DeveloperApi\Admin\EditorIntegration;
 use Zoviz\DeveloperApi\Admin\Menu;
 use Zoviz\DeveloperApi\Admin\MediaLibraryIntegration;
 use Zoviz\DeveloperApi\Admin\Notices;
+use Zoviz\DeveloperApi\Admin\WooCommerceIntegration;
 use Zoviz\DeveloperApi\Api\ApiClient;
 use Zoviz\DeveloperApi\Jobs\JobManager;
 use Zoviz\DeveloperApi\Jobs\JobRepository;
@@ -219,6 +220,13 @@ final class DeveloperApiComponent implements ComponentInterface {
 				return new EditorIntegration( $c->get( Assets::class ), $c->get( KeyRepository::class ) );
 			}
 		);
+
+		$container->set(
+			WooCommerceIntegration::class,
+			static function ( Container $c ) {
+				return new WooCommerceIntegration( $c->get( Assets::class ), $c->get( KeyRepository::class ) );
+			}
+		);
 	}
 
 	/**
@@ -245,6 +253,10 @@ final class DeveloperApiComponent implements ComponentInterface {
 			$container->get( Notices::class )->register();
 			$container->get( MediaLibraryIntegration::class )->register();
 			$container->get( EditorIntegration::class )->register();
+
+			if ( class_exists( 'WooCommerce' ) ) {
+				$container->get( WooCommerceIntegration::class )->register();
+			}
 		}
 
 		// REST proxy: the browser never sees API keys.
