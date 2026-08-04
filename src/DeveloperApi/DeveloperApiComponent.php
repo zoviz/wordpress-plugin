@@ -8,8 +8,12 @@
 namespace Zoviz\DeveloperApi;
 
 use Zoviz\DeveloperApi\Api\ApiClient;
+use Zoviz\DeveloperApi\Jobs\JobManager;
+use Zoviz\DeveloperApi\Jobs\JobRepository;
+use Zoviz\DeveloperApi\Jobs\JobSweeper;
 use Zoviz\DeveloperApi\Keys\KeyManager;
 use Zoviz\DeveloperApi\Keys\KeyRepository;
+use Zoviz\DeveloperApi\Media\MediaImporter;
 use Zoviz\DeveloperApi\Services\BackgroundRemoverService;
 use Zoviz\DeveloperApi\Services\ImageEditorService;
 use Zoviz\DeveloperApi\Services\ImageGenerator2Service;
@@ -19,6 +23,7 @@ use Zoviz\DeveloperApi\Services\ProductPhotographyService;
 use Zoviz\DeveloperApi\Services\ServiceRegistry;
 use Zoviz\DeveloperApi\Services\SketchToImageService;
 use Zoviz\Infrastructure\Crypto\Encryptor;
+use Zoviz\Infrastructure\Database\Schema;
 use Zoviz\Infrastructure\Http\HttpTransport;
 use Zoviz\Infrastructure\Http\WpHttpTransport;
 use Zoviz\Kernel\ComponentInterface;
@@ -118,6 +123,52 @@ final class DeveloperApiComponent implements ComponentInterface {
 				return new KeyManager( $c->get( ApiClient::class ), $c->get( KeyRepository::class ) );
 			}
 		);
+
+		$container->set(
+			Settings::class,
+			static function () {
+				return new Settings();
+			}
+		);
+
+		$container->set(
+			JobRepository::class,
+			static function () {
+				return new JobRepository();
+			}
+		);
+
+		$container->set(
+			MediaImporter::class,
+			static function () {
+				return new MediaImporter();
+			}
+		);
+
+		$container->set(
+			JobManager::class,
+			static function ( Container $c ) {
+				return new JobManager(
+					$c->get( ApiClient::class ),
+					$c->get( JobRepository::class ),
+					$c->get( KeyRepository::class ),
+					$c->get( ServiceRegistry::class ),
+					$c->get( MediaImporter::class ),
+					$c->get( Settings::class )
+				);
+			}
+		);
+
+		$container->set(
+			JobSweeper::class,
+			static function ( Container $c ) {
+				return new JobSweeper(
+					$c->get( JobManager::class ),
+					$c->get( JobRepository::class ),
+					$c->get( Settings::class )
+				);
+			}
+		);
 	}
 
 	/**
@@ -127,6 +178,33 @@ final class DeveloperApiComponent implements ComponentInterface {
 	 * @return void
 	 */
 	public function boot( Container $container ) {
-		// Hooks arrive with the REST layer and admin surfaces.
+		// Schema lifecycle.
+		add_action(
+			'zoviz_activate',
+			static function () {
+				Schema::install();
+				JobSweeper::schedule();
+			}
+		);
+		add_action( 'zoviz_deactivate', array( JobSweeper::class, 'unschedule' ) );
+
+		if ( is_admin() ) {
+			add_action( 'admin_init', array( Schema::class, 'maybe_upgrade' ) );
+		}
+
+		// Cron sweeper (backstop for jobs the browser stopped polling).
+		add_filter( 'cron_schedules', array( JobSweeper::class, 'add_interval' ) ); // phpcs:ignore WordPress.WP.CronInterval.ChangeDetected -- Interval is 2 minutes (JobSweeper::add_interval); intentional, the sweeper is time-boxed and light.
+		add_action(
+			JobSweeper::HOOK_SWEEP,
+			static function () use ( $container ) {
+				$container->get( JobSweeper::class )->sweep();
+			}
+		);
+		add_action(
+			JobSweeper::HOOK_PRUNE,
+			static function () use ( $container ) {
+				$container->get( JobSweeper::class )->prune();
+			}
+		);
 	}
 }

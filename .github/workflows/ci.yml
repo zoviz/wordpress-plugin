@@ -44,6 +44,43 @@ jobs:
       - uses: ramsey/composer-install@v3
       - run: composer test:unit
 
+  php-integration:
+    name: PHP integration (WP ${{ matrix.wp }}, PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - wp: '6.4'
+            php: '7.4'
+          - wp: 'latest'
+            php: '8.3'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer
+      - uses: ramsey/composer-install@v3
+      - name: Pin wp-phpunit to the WordPress version under test
+        if: matrix.wp != 'latest'
+        run: |
+          composer require --dev --no-interaction --with-all-dependencies \
+            "wp-phpunit/wp-phpunit:~${{ matrix.wp }}.0" \
+            "yoast/phpunit-polyfills:^1.1"
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - name: Pin wp-env core to the WordPress version under test
+        if: matrix.wp != 'latest'
+        run: |
+          echo '{ "core": "WordPress/WordPress#${{ matrix.wp }}", "phpVersion": "${{ matrix.php }}" }' > .wp-env.override.json
+      - run: npx wp-env start
+      - run: npm run test:php:integration
+
   js:
     name: JS lint, test & build
     runs-on: ubuntu-latest

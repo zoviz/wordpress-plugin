@@ -161,7 +161,7 @@ class ApiClientTest extends TestCase {
 		$this->assertTrue( $status->is_terminal() );
 		$this->assertSame( 1, $status->credits_used() );
 		$this->assertSame( 'image/png', $status->content_type() );
-		$this->assertSame( '2026-08-03T16:01:12.000Z', $status->expires_at() );
+		$this->assertSame( '2126-08-03T16:01:12.000Z', $status->expires_at() );
 	}
 
 	public function test_download_streams_to_destination() {

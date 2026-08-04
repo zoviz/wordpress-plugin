@@ -3,6 +3,7 @@
 	<description>Coding standards for the Zoviz AI Studio plugin.</description>
 
 	<file>zoviz-ai-studio.php</file>
+	<file>uninstall.php</file>
 	<file>src</file>
 	<file>tests</file>
 
