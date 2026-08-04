@@ -1,0 +1,83 @@
+name: Release
+
+# Manual dispatch only — merging to main never releases anything. See
+# docs/release-process.md for the full explanation and the reasoning.
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: release-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Test
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      pull-requests: read
+
+  release:
+    name: Release
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # A PAT/App token is required so the version-bump commit can be
+          # pushed to protected `main` — the default GITHUB_TOKEN cannot.
+          token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - id: semantic
+        name: semantic-release
+        uses: cycjimmy/semantic-release-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+
+  deploy:
+    name: Deploy to WordPress.org
+    needs: release
+    if: needs.release.outputs.new_release_published == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.release.outputs.new_release_version }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+      - run: composer install --no-dev --classmap-authoritative --optimize-autoloader
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy to the WordPress.org plugin SVN
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          # The GitHub repo (wordpress-plugin) does not match the wp.org
+          # slug — this must stay explicit.
+          SLUG: zoviz-ai-studio
+      - name: Build the zip for the GitHub Release
+        run: bin/build-zip.sh
+      - name: Attach the zip to the GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.release.outputs.new_release_version }}
+          files: build/zoviz-ai-studio.zip

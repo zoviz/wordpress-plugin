@@ -100,6 +100,57 @@ jobs:
           path: build/
           retention-days: 3
 
+  i18n:
+    name: POT freshness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regenerate the POT file
+        # wp-cli's `i18n make-pot` runs on the `before_wp_load` hook, so the
+        # official wp-cli image can do this without a database or a full
+        # WordPress install.
+        run: |
+          docker run --rm -v "${{ github.workspace }}":/app -w /app wordpress:cli \
+            wp i18n make-pot . languages/zoviz-ai-studio.pot.fresh \
+              --domain=zoviz-ai-studio \
+              --exclude=node_modules,vendor,tests,build,docs \
+              --allow-root
+      - name: Compare against the committed POT (ignoring the creation timestamp)
+        run: |
+          if ! diff \
+            <(grep -v '^"POT-Creation-Date:' languages/zoviz-ai-studio.pot) \
+            <(grep -v '^"POT-Creation-Date:' languages/zoviz-ai-studio.pot.fresh); then
+            echo "::error::languages/zoviz-ai-studio.pot is out of date — see docs/i18n.md for how to regenerate it, then commit the result." >&2
+            exit 1
+          fi
+
+  plugin-check:
+    name: WordPress Plugin Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: composer
+      - uses: ramsey/composer-install@v3
+        with:
+          composer-options: '--no-dev --classmap-authoritative'
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # NOTE: pin/verify this action's current inputs against
+      # https://github.com/WordPress/plugin-check-action on first use — the
+      # action's API has changed across major versions.
+      - name: Run Plugin Check
+        uses: WordPress/plugin-check-action@v1
+        with:
+          build-dir: '.'
+
   pr-title:
     name: Conventional PR title
     if: github.event_name == 'pull_request'

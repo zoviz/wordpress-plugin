@@ -1,5 +1,6 @@
 {
 	"name": "zoviz/zoviz-ai-studio",
+	"version": "0.1.0",
 	"description": "Official Zoviz plugin for WordPress: AI image generation, editing, and enhancement powered by the Zoviz Developer API.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
