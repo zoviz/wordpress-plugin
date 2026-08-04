@@ -216,16 +216,30 @@ a.zoviz-credit-badge.is-error {
 		width: 100%;
 		padding: 10px 12px;
 		font-weight: 500;
-		color: var(--zoviz-ink);
 
-		&:hover:not(:disabled) {
+		// Scoped to :not(.is-primary): without it, this equal-specificity
+		// rule loads after wp-components' own `.is-primary { color: #fff }`
+		// and wins the tie, leaving the selected item's own hover state
+		// (background: var(--zoviz-accent-hover), darker still) with dark
+		// text on a dark background.
+		&:not(.is-primary) {
+			color: var(--zoviz-ink);
+		}
+
+		/* stylelint-disable-next-line no-descending-specificity */
+		&:hover:not(:disabled):not(.is-primary) {
 			background: var(--zoviz-accent-soft);
 			color: var(--zoviz-accent-hover);
 		}
 
 		/* stylelint-disable-next-line no-descending-specificity */
 		&.is-primary {
+			color: #fff;
 			box-shadow: var(--zoviz-shadow-sm);
+
+			&:hover:not(:disabled) {
+				color: #fff;
+			}
 		}
 	}
 }
@@ -275,6 +289,7 @@ a.zoviz-credit-badge.is-error {
 .zoviz-source-picker__controls {
 	position: relative;
 	display: flex;
+	flex-wrap: wrap;
 	gap: var(--zoviz-space-2);
 	padding: var(--zoviz-space-5);
 	background: #fafafe;
