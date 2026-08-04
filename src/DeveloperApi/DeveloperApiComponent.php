@@ -7,6 +7,7 @@
 
 namespace Zoviz\DeveloperApi;
 
+use Zoviz\DeveloperApi\Admin\EditorIntegration;
 use Zoviz\DeveloperApi\Admin\Menu;
 use Zoviz\DeveloperApi\Admin\MediaLibraryIntegration;
 use Zoviz\DeveloperApi\Admin\Notices;
@@ -211,6 +212,13 @@ final class DeveloperApiComponent implements ComponentInterface {
 				);
 			}
 		);
+
+		$container->set(
+			EditorIntegration::class,
+			static function ( Container $c ) {
+				return new EditorIntegration( $c->get( Assets::class ), $c->get( KeyRepository::class ) );
+			}
+		);
 	}
 
 	/**
@@ -236,6 +244,7 @@ final class DeveloperApiComponent implements ComponentInterface {
 			$container->get( Menu::class )->register();
 			$container->get( Notices::class )->register();
 			$container->get( MediaLibraryIntegration::class )->register();
+			$container->get( EditorIntegration::class )->register();
 		}
 
 		// REST proxy: the browser never sees API keys.
