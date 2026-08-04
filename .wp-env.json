@@ -1,0 +1,14 @@
+{
+	"core": null,
+	"mappings": {
+		"wp-content/plugins/zoviz-ai-studio": "."
+	},
+	"lifecycleScripts": {
+		"afterStart": "wp-env run cli wp plugin activate zoviz-ai-studio && wp-env run tests-cli wp plugin activate zoviz-ai-studio"
+	},
+	"config": {
+		"WP_DEBUG": true,
+		"WP_DEBUG_LOG": true,
+		"SCRIPT_DEBUG": true
+	}
+}

@@ -1,0 +1,7 @@
+# szepeviktor/phpstan-wordpress is auto-included via phpstan/extension-installer.
+parameters:
+	level: 6
+	paths:
+		- src
+		- zoviz-ai-studio.php
+	treatPhpDocTypesAsCertain: false

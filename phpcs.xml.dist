@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<ruleset name="Zoviz AI Studio">
+	<description>Coding standards for the Zoviz AI Studio plugin.</description>
+
+	<file>zoviz-ai-studio.php</file>
+	<file>src</file>
+	<file>tests</file>
+
+	<arg name="extensions" value="php"/>
+	<arg value="ps"/>
+	<arg name="parallel" value="8"/>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/build/*</exclude-pattern>
+
+	<!-- Supported WordPress and PHP ranges. -->
+	<config name="minimum_wp_version" value="6.4"/>
+	<config name="testVersion" value="7.4-"/>
+
+	<rule ref="WordPress-Extra">
+		<!-- PSR-4 file naming is used (Composer autoloading). -->
+		<exclude name="WordPress.Files.FileName"/>
+	</rule>
+
+	<!-- The throws-tag sniff only counts literal `throw` statements, so it
+	     forbids documenting exceptions that bubble up from called methods.
+	     PHPStan needs those @throws tags for exception inference, and
+	     accurate docs beat the sniff's limited model. -->
+	<rule ref="Squiz.Commenting.FunctionCommentThrowTag">
+		<exclude name="Squiz.Commenting.FunctionCommentThrowTag"/>
+	</rule>
+
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="zoviz-ai-studio"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="zoviz"/>
+				<element value="Zoviz"/>
+				<element value="ZOVIZ"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Documentation standards apply to shipped code, not tests. -->
+	<rule ref="WordPress-Docs">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Tests follow PHPUnit conventions (camelCase lifecycle methods, no
+	     docblock ceremony) and may use plain PHP functions and unescaped
+	     developer-facing exception messages. -->
+	<rule ref="WordPress.NamingConventions.ValidFunctionName">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Commenting.DocComment">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.Security.EscapeOutput">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="Universal.Operators.DisallowShortTernary">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+</ruleset>

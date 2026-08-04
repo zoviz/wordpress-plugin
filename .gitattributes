@@ -1,0 +1,36 @@
+# Normalize line endings.
+* text=auto eol=lf
+
+# Exclude development files from `git archive` exports.
+# (The wp.org release package is assembled by bin/build-zip.sh / CI using .distignore.)
+/.agents            export-ignore
+/.claude            export-ignore
+/.github            export-ignore
+/.idea              export-ignore
+/.wordpress-org     export-ignore
+/bin                export-ignore
+/client             export-ignore
+/docs               export-ignore
+/tests              export-ignore
+/.distignore        export-ignore
+/.editorconfig      export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore
+/.nvmrc             export-ignore
+/.releaserc.json    export-ignore
+/.wp-env.json       export-ignore
+/CHANGELOG.md       export-ignore
+/CLAUDE.md          export-ignore
+/CONTRIBUTING.md    export-ignore
+/CREDITS.md         export-ignore
+/README.md          export-ignore
+/SECURITY.md        export-ignore
+/composer.json      export-ignore
+/composer.lock      export-ignore
+/package.json       export-ignore
+/package-lock.json  export-ignore
+/phpcs.xml.dist     export-ignore
+/phpstan.neon.dist  export-ignore
+/phpunit.xml.dist   export-ignore
+/phpunit-integration.xml.dist export-ignore
+/webpack.config.js  export-ignore
