@@ -14,6 +14,12 @@ use Zoviz\DeveloperApi\Jobs\JobSweeper;
 use Zoviz\DeveloperApi\Keys\KeyManager;
 use Zoviz\DeveloperApi\Keys\KeyRepository;
 use Zoviz\DeveloperApi\Media\MediaImporter;
+use Zoviz\DeveloperApi\Rest\CreditsController;
+use Zoviz\DeveloperApi\Rest\JobsController;
+use Zoviz\DeveloperApi\Rest\KeysController;
+use Zoviz\DeveloperApi\Rest\NoticesController;
+use Zoviz\DeveloperApi\Rest\ServicesController;
+use Zoviz\DeveloperApi\Rest\SettingsController;
 use Zoviz\DeveloperApi\Services\BackgroundRemoverService;
 use Zoviz\DeveloperApi\Services\ImageEditorService;
 use Zoviz\DeveloperApi\Services\ImageGenerator2Service;
@@ -191,6 +197,29 @@ final class DeveloperApiComponent implements ComponentInterface {
 		if ( is_admin() ) {
 			add_action( 'admin_init', array( Schema::class, 'maybe_upgrade' ) );
 		}
+
+		// REST proxy: the browser never sees API keys.
+		add_action(
+			'rest_api_init',
+			static function () use ( $container ) {
+				$controllers = array(
+					new JobsController(
+						$container->get( JobManager::class ),
+						$container->get( JobRepository::class ),
+						$container->get( ServiceRegistry::class )
+					),
+					new KeysController( $container->get( KeyManager::class ), $container->get( KeyRepository::class ) ),
+					new CreditsController( $container->get( KeyManager::class ), $container->get( KeyRepository::class ) ),
+					new ServicesController( $container->get( ServiceRegistry::class ) ),
+					new SettingsController( $container->get( Settings::class ) ),
+					new NoticesController(),
+				);
+
+				foreach ( $controllers as $controller ) {
+					$controller->register_routes();
+				}
+			}
+		);
 
 		// Cron sweeper (backstop for jobs the browser stopped polling).
 		add_filter( 'cron_schedules', array( JobSweeper::class, 'add_interval' ) ); // phpcs:ignore WordPress.WP.CronInterval.ChangeDetected -- Interval is 2 minutes (JobSweeper::add_interval); intentional, the sweeper is time-boxed and light.
