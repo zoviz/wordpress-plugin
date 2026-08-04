@@ -7,6 +7,8 @@
 
 namespace Zoviz\DeveloperApi;
 
+use Zoviz\DeveloperApi\Admin\Menu;
+use Zoviz\DeveloperApi\Admin\Notices;
 use Zoviz\DeveloperApi\Api\ApiClient;
 use Zoviz\DeveloperApi\Jobs\JobManager;
 use Zoviz\DeveloperApi\Jobs\JobRepository;
@@ -32,8 +34,10 @@ use Zoviz\Infrastructure\Crypto\Encryptor;
 use Zoviz\Infrastructure\Database\Schema;
 use Zoviz\Infrastructure\Http\HttpTransport;
 use Zoviz\Infrastructure\Http\WpHttpTransport;
+use Zoviz\Kernel\Assets;
 use Zoviz\Kernel\ComponentInterface;
 use Zoviz\Kernel\Container;
+use Zoviz\Kernel\Plugin;
 
 /**
  * Integrates the Zoviz Developer API (developer.zoviz.com): API keys,
@@ -175,6 +179,27 @@ final class DeveloperApiComponent implements ComponentInterface {
 				);
 			}
 		);
+
+		$container->set(
+			Assets::class,
+			static function () {
+				return new Assets( Plugin::instance() );
+			}
+		);
+
+		$container->set(
+			Menu::class,
+			static function ( Container $c ) {
+				return new Menu( $c->get( Assets::class ), $c->get( KeyRepository::class ) );
+			}
+		);
+
+		$container->set(
+			Notices::class,
+			static function ( Container $c ) {
+				return new Notices( $c->get( KeyRepository::class ) );
+			}
+		);
 	}
 
 	/**
@@ -196,6 +221,9 @@ final class DeveloperApiComponent implements ComponentInterface {
 
 		if ( is_admin() ) {
 			add_action( 'admin_init', array( Schema::class, 'maybe_upgrade' ) );
+
+			$container->get( Menu::class )->register();
+			$container->get( Notices::class )->register();
 		}
 
 		// REST proxy: the browser never sees API keys.

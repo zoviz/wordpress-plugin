@@ -6,10 +6,13 @@ use Zoviz\Tests\Integration\Support\RestTestCase;
 
 class KeysAndCreditsTest extends RestTestCase {
 
-	public function test_keys_routes_require_admin() {
+	public function test_key_mutations_require_admin_but_masked_list_does_not() {
 		wp_set_current_user( $this->author_id );
 
-		$this->assertSame( 403, $this->request( 'GET', '/keys' )->get_status() );
+		// Authors may read the masked list (needed for the key picker)...
+		$this->assertSame( 200, $this->request( 'GET', '/keys' )->get_status() );
+
+		// ...but never mutate keys.
 		$this->assertSame(
 			403,
 			$this->request(
@@ -21,6 +24,12 @@ class KeysAndCreditsTest extends RestTestCase {
 				)
 			)->get_status()
 		);
+		$this->assertSame( 403, $this->request( 'PUT', '/keys/k_abc123', array( 'label' => 'X' ) )->get_status() );
+		$this->assertSame( 403, $this->request( 'DELETE', '/keys/k_abc123' )->get_status() );
+
+		// Subscribers may not even read the list.
+		wp_set_current_user( $this->subscriber_id );
+		$this->assertSame( 403, $this->request( 'GET', '/keys' )->get_status() );
 	}
 
 	public function test_create_key_validates_against_live_api() {

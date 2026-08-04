@@ -55,9 +55,11 @@ final class KeysController extends RestController {
 			'/' . $this->rest_base,
 			array(
 				array(
+					// Masked list only (labels + last four characters, never
+					// secrets): content creators need it for the key picker.
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'can_manage' ),
+					'permission_callback' => array( $this, 'can_use_services' ),
 				),
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
