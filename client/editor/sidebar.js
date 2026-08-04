@@ -36,6 +36,7 @@ import {
 } from '../shared/components/service-form';
 import { SourcePicker } from '../shared/components/source-picker';
 import { useServices } from '../shared/hooks/use-services';
+import { serviceIcon } from '../shared/service-icons';
 import { onRunRequested } from './state';
 
 const PLUGIN_NAME = 'zoviz-ai-studio';
@@ -182,7 +183,7 @@ function ZovizSidebarBody() {
 			title={ __( 'Zoviz AI Studio', 'zoviz-ai-studio' ) }
 			icon="art"
 		>
-			<PanelBody>
+			<PanelBody className="zoviz-app zoviz-editor-sidebar">
 				<Flex justify="flex-end" gap={ 2 }>
 					<FlexItem>
 						<KeyPicker value={ keyId } onChange={ setKeyId } />
@@ -192,10 +193,15 @@ function ZovizSidebarBody() {
 					</FlexItem>
 				</Flex>
 
-				<Flex wrap gap={ 1 } className="zoviz-editor-sidebar__services">
+				<Flex
+					wrap
+					gap={ 1 }
+					className="zoviz-editor-sidebar__services zoviz-service-nav zoviz-service-nav--compact"
+				>
 					{ ( services || [] ).map( ( entry ) => (
 						<Button
 							key={ entry.id }
+							icon={ serviceIcon( entry.id ) }
 							variant={
 								entry.id === serviceId ? 'primary' : 'tertiary'
 							}

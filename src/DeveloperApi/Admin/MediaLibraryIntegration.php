@@ -10,6 +10,7 @@ namespace Zoviz\DeveloperApi\Admin;
 use Zoviz\DeveloperApi\Jobs\JobRepository;
 use Zoviz\DeveloperApi\Services\ServiceInterface;
 use Zoviz\DeveloperApi\Services\ServiceRegistry;
+use Zoviz\Kernel\Assets;
 
 /**
  * Adds Zoviz actions to eligible image attachments: list-table row actions,
@@ -35,14 +36,23 @@ final class MediaLibraryIntegration {
 	private $jobs;
 
 	/**
+	 * Asset registrar (styles the action links — no interactive JS ships here).
+	 *
+	 * @var Assets
+	 */
+	private $assets;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param ServiceRegistry $services Service registry.
 	 * @param JobRepository   $jobs     Job repository.
+	 * @param Assets          $assets   Asset registrar.
 	 */
-	public function __construct( ServiceRegistry $services, JobRepository $jobs ) {
+	public function __construct( ServiceRegistry $services, JobRepository $jobs, Assets $assets ) {
 		$this->services = $services;
 		$this->jobs     = $jobs;
+		$this->assets   = $assets;
 	}
 
 	/**
@@ -55,6 +65,21 @@ final class MediaLibraryIntegration {
 		add_filter( 'attachment_fields_to_edit', array( $this, 'add_attachment_field' ), 10, 2 );
 		add_action( 'attachment_submitbox_misc_actions', array( $this, 'render_submitbox_action' ) );
 		add_filter( 'wp_prepare_attachment_for_js', array( $this, 'add_js_data' ), 10, 2 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+	}
+
+	/**
+	 * Enqueues the small stylesheet the action links above use. There is no
+	 * interactive script here (no Backbone view overrides), so this loads
+	 * broadly rather than trying to enumerate every screen the modal or the
+	 * attachment edit screen can appear on.
+	 *
+	 * @return void
+	 */
+	public function enqueue() {
+		if ( current_user_can( 'upload_files' ) ) {
+			$this->assets->enqueue( 'media' );
+		}
 	}
 
 	/**
@@ -241,7 +266,7 @@ final class MediaLibraryIntegration {
 			esc_html__( 'Open in Zoviz AI Studio', 'zoviz-ai-studio' )
 		);
 
-		return implode( ' ', $links );
+		return '<div class="zoviz-media-actions">' . implode( '', $links ) . '</div>';
 	}
 
 	/**

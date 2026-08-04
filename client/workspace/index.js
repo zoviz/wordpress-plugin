@@ -9,18 +9,20 @@ import { createRoot, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getQueryArg } from '@wordpress/url';
 
-import '../shared/style.scss';
+import '../shared/styles.scss';
 import { submitJob } from '../shared/api/client';
 import { CreditBadge } from '../shared/components/credit-badge';
 import { ApiErrorNotice } from '../shared/components/insufficient-credits-notice';
 import { JobRunner } from '../shared/components/job-runner';
 import { KeyPicker } from '../shared/components/key-picker';
+import { LogoMark } from '../shared/components/logo-mark';
 import { MaskCanvas } from '../shared/components/mask-canvas';
 import {
 	ServiceForm,
 	scalarFieldsComplete,
 } from '../shared/components/service-form';
 import { SourcePicker } from '../shared/components/source-picker';
+import { serviceIcon } from '../shared/service-icons';
 import { useServices } from '../shared/hooks/use-services';
 
 function WorkspaceApp() {
@@ -125,7 +127,10 @@ function WorkspaceApp() {
 	return (
 		<div className="zoviz-app">
 			<div className="zoviz-app__header">
-				<h1>{ __( 'Zoviz AI Studio', 'zoviz-ai-studio' ) }</h1>
+				<div className="zoviz-app__title">
+					<LogoMark />
+					<h1>{ __( 'Zoviz AI Studio', 'zoviz-ai-studio' ) }</h1>
+				</div>
 				<Flex justify="flex-end" gap={ 3 }>
 					<FlexItem>
 						<KeyPicker value={ keyId } onChange={ setKeyId } />
@@ -138,12 +143,13 @@ function WorkspaceApp() {
 
 			<div className="zoviz-workspace">
 				<nav
-					className="zoviz-workspace__services"
+					className="zoviz-workspace__services zoviz-service-nav"
 					aria-label={ __( 'Zoviz services', 'zoviz-ai-studio' ) }
 				>
 					{ ( services || [] ).map( ( entry ) => (
 						<Button
 							key={ entry.id }
+							icon={ serviceIcon( entry.id ) }
 							variant={
 								entry.id === serviceId ? 'primary' : 'tertiary'
 							}

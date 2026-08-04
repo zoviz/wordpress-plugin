@@ -11,7 +11,7 @@ import domReady from '@wordpress/dom-ready';
 import { createRoot, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import '../shared/style.scss';
+import '../shared/styles.scss';
 import { bootData, saveJob, submitJob } from '../shared/api/client';
 import { CreditBadge } from '../shared/components/credit-badge';
 import { ApiErrorNotice } from '../shared/components/insufficient-credits-notice';
@@ -23,6 +23,7 @@ import {
 } from '../shared/components/service-form';
 import { SourcePicker } from '../shared/components/source-picker';
 import { useServices } from '../shared/hooks/use-services';
+import { serviceIcon } from '../shared/service-icons';
 
 const DEFAULT_SERVICE = 'product-photography';
 
@@ -139,10 +140,15 @@ function WooProductApp() {
 				</FlexItem>
 			</Flex>
 
-			<Flex wrap gap={ 1 } className="zoviz-woocommerce__services">
+			<Flex
+				wrap
+				gap={ 1 }
+				className="zoviz-woocommerce__services zoviz-service-nav zoviz-service-nav--compact"
+			>
 				{ ( services || [] ).map( ( entry ) => (
 					<Button
 						key={ entry.id }
+						icon={ serviceIcon( entry.id ) }
 						variant={
 							entry.id === serviceId ? 'primary' : 'tertiary'
 						}

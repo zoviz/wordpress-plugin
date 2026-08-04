@@ -1,0 +1,502 @@
+/**
+ * Shared styles for the Zoviz AI Studio admin apps. Each JS entry imports
+ * this file directly (not just the "workspace" one) — see webpack.config.js
+ * for why this file must NOT be named `style.scss`: that name triggers
+ * @wordpress/scripts' default webpack config to merge every entry's copy
+ * into a single shared chunk keyed off one arbitrary entry, which silently
+ * broke style loading for every other entry (Kernel\Assets::register()
+ * looks for `build/<entry>.css`, one per bundle).
+ */
+
+// ---------------------------------------------------------------------------
+// Design tokens. Scoped (not :root) so they never leak onto surrounding
+// wp-admin chrome; every top-level surface carries one of these classes.
+// ---------------------------------------------------------------------------
+.zoviz-app,
+.zoviz-editor-sidebar,
+.zoviz-woocommerce {
+	--zoviz-accent: #4f46e5;
+	--zoviz-accent-hover: #4338ca;
+	--zoviz-accent-soft: #eef2ff;
+	--zoviz-accent-soft-hover: #e0e7ff;
+	--zoviz-ink: #1e1b2e;
+	--zoviz-muted: #6b7280;
+	--zoviz-border: #e5e5ec;
+	--zoviz-surface: #fff;
+	--zoviz-radius-sm: 6px;
+	--zoviz-radius: 8px;
+	--zoviz-radius-lg: 14px;
+	--zoviz-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+	--zoviz-shadow:
+		0 1px 3px rgba(16, 24, 40, 0.08),
+		0 4px 12px rgba(16, 24, 40, 0.05);
+	--zoviz-space-1: 4px;
+	--zoviz-space-2: 8px;
+	--zoviz-space-3: 12px;
+	--zoviz-space-4: 16px;
+	--zoviz-space-5: 24px;
+	--zoviz-space-6: 32px;
+
+	// Give WP's own primary button the brand color everywhere in the app,
+	// without overriding component internals — only the color tokens.
+	.components-button.is-primary {
+		background: var(--zoviz-accent);
+		border-color: var(--zoviz-accent);
+
+		&:hover:not(:disabled) {
+			background: var(--zoviz-accent-hover);
+			border-color: var(--zoviz-accent-hover);
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--zoviz-accent);
+		}
+	}
+
+	.components-button,
+	.components-text-control__input,
+	.components-select-control__input,
+	.components-textarea-control__input {
+		border-radius: var(--zoviz-radius-sm);
+	}
+
+	// A softer link color that matches the brand rather than WP core blue.
+	a {
+		color: var(--zoviz-accent);
+
+		&:hover {
+			color: var(--zoviz-accent-hover);
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Page shell
+// ---------------------------------------------------------------------------
+.zoviz-app {
+	max-width: 1080px;
+
+	.components-notice {
+		margin: 0 0 var(--zoviz-space-4);
+	}
+}
+
+.zoviz-app__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--zoviz-space-4);
+	flex-wrap: wrap;
+	margin: var(--zoviz-space-4) 0 var(--zoviz-space-5);
+	padding-bottom: var(--zoviz-space-4);
+	border-bottom: 1px solid var(--zoviz-border);
+
+	h1 {
+		margin: 0;
+		padding: 0;
+		font-size: 22px;
+		font-weight: 600;
+		color: var(--zoviz-ink);
+	}
+}
+
+.zoviz-app__title {
+	display: flex;
+	align-items: center;
+	gap: var(--zoviz-space-3);
+}
+
+// The little branded square next to every page title.
+.zoviz-logo {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	flex: 0 0 auto;
+	border-radius: var(--zoviz-radius);
+	background: linear-gradient(135deg, #6366f1, #4338ca);
+	color: #fff;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	box-shadow: var(--zoviz-shadow-sm);
+}
+
+// ---------------------------------------------------------------------------
+// Credit badge
+// ---------------------------------------------------------------------------
+.zoviz-credit-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--zoviz-space-1);
+	padding: 6px 12px;
+	border-radius: 999px;
+	background: var(--zoviz-accent-soft);
+	color: #3730a3;
+	font-weight: 600;
+	font-size: 13px;
+	white-space: nowrap;
+
+	&.is-empty {
+		background: #fef2f2;
+		color: #b91c1c;
+	}
+
+	&.is-error {
+		background: #fffbeb;
+		color: #92400e;
+		font-weight: 500;
+	}
+}
+
+a.zoviz-credit-badge.is-error {
+	text-decoration: none;
+	transition: background-color 0.15s ease;
+
+	&:hover {
+		background: #fef3c7;
+		color: #92400e;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Cards — the boxed panels used on Settings, Jobs, and the Workspace panel.
+// ---------------------------------------------------------------------------
+.zoviz-card.components-card {
+	border-radius: var(--zoviz-radius-lg);
+	box-shadow: var(--zoviz-shadow);
+	margin-bottom: var(--zoviz-space-5);
+
+	.components-card__header {
+		padding: var(--zoviz-space-4) var(--zoviz-space-5);
+
+		h2 {
+			margin: 0;
+			font-size: 15px;
+			font-weight: 600;
+		}
+	}
+
+	.components-card__body {
+		padding: var(--zoviz-space-5);
+	}
+}
+
+.zoviz-cards {
+	display: flex;
+	flex-direction: column;
+	gap: var(--zoviz-space-5);
+	max-width: 640px;
+}
+
+// ---------------------------------------------------------------------------
+// Workspace layout
+// ---------------------------------------------------------------------------
+.zoviz-workspace {
+	display: grid;
+	grid-template-columns: 240px minmax(0, 1fr);
+	gap: var(--zoviz-space-5);
+	align-items: start;
+
+	@media ( max-width: 782px ) {
+		grid-template-columns: 1fr;
+	}
+}
+
+// Vertical service nav shared by the Workspace, the editor sidebar, and the
+// WooCommerce panel: a clean list of pill items rather than a wall of links.
+.zoviz-service-nav {
+	display: flex;
+	flex-direction: column;
+	gap: var(--zoviz-space-1);
+
+	.components-button {
+		justify-content: flex-start;
+		width: 100%;
+		padding: 10px 12px;
+		font-weight: 500;
+		color: var(--zoviz-ink);
+
+		&:hover:not(:disabled) {
+			background: var(--zoviz-accent-soft);
+			color: var(--zoviz-accent-hover);
+		}
+
+		/* stylelint-disable-next-line no-descending-specificity */
+		&.is-primary {
+			box-shadow: var(--zoviz-shadow-sm);
+		}
+	}
+}
+
+// Compact variant used inline (editor sidebar, WooCommerce metabox) where
+// there isn't room for a full-width vertical list.
+.zoviz-service-nav--compact {
+	flex-direction: row;
+
+	/* stylelint-disable-next-line no-descending-specificity */
+	.components-button {
+		width: auto;
+	}
+}
+
+.zoviz-workspace__panel {
+	background: var(--zoviz-surface);
+	border: 1px solid var(--zoviz-border);
+	border-radius: var(--zoviz-radius-lg);
+	box-shadow: var(--zoviz-shadow);
+	padding: var(--zoviz-space-5);
+
+	> * + * {
+		margin-top: var(--zoviz-space-4);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Forms
+// ---------------------------------------------------------------------------
+.zoviz-service-form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--zoviz-space-4);
+	max-width: 480px;
+}
+
+.zoviz-source-picker__preview img {
+	max-width: 320px;
+	max-height: 240px;
+	display: block;
+	border: 1px solid var(--zoviz-border);
+	border-radius: var(--zoviz-radius);
+	margin-bottom: var(--zoviz-space-2);
+}
+
+.zoviz-source-picker__controls {
+	position: relative;
+	display: flex;
+	gap: var(--zoviz-space-2);
+	padding: var(--zoviz-space-5);
+	background: #fafafe;
+	border: 1.5px dashed #c7c7e0;
+	border-radius: var(--zoviz-radius);
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+
+	&:hover {
+		border-color: var(--zoviz-accent);
+		background: var(--zoviz-accent-soft);
+	}
+}
+
+.zoviz-mask-canvas__toolbar {
+	display: flex;
+	align-items: flex-end;
+	gap: var(--zoviz-space-3);
+	flex-wrap: wrap;
+
+	.components-base-control {
+		min-width: 180px;
+		margin-bottom: 0;
+	}
+}
+
+.zoviz-mask-canvas__surface {
+	max-width: 100%;
+	height: auto;
+	border: 1px solid var(--zoviz-border);
+	border-radius: var(--zoviz-radius);
+	cursor: crosshair;
+	touch-action: none;
+}
+
+// ---------------------------------------------------------------------------
+// Job progress + result preview
+// ---------------------------------------------------------------------------
+.zoviz-job-progress {
+	display: flex;
+	align-items: center;
+	gap: var(--zoviz-space-2);
+	color: var(--zoviz-muted);
+}
+
+.zoviz-result-preview {
+	padding-top: var(--zoviz-space-2);
+}
+
+.zoviz-result-preview img {
+	max-width: 100%;
+	max-height: 480px;
+	display: block;
+	border: 1px solid var(--zoviz-border);
+	border-radius: var(--zoviz-radius);
+	box-shadow: var(--zoviz-shadow-sm);
+}
+
+.zoviz-result-preview__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--zoviz-space-3);
+	flex-wrap: wrap;
+	margin-top: var(--zoviz-space-2);
+}
+
+.zoviz-result-preview__saved {
+	color: #15803d;
+	font-weight: 500;
+}
+
+// ---------------------------------------------------------------------------
+// Tables (Jobs history, API keys)
+// ---------------------------------------------------------------------------
+.zoviz-jobs-table,
+.zoviz-keys-table {
+
+	&.widefat {
+		border: none;
+		box-shadow: none;
+	}
+
+	border-collapse: separate;
+	border-spacing: 0;
+	width: 100%;
+	margin-bottom: var(--zoviz-space-4);
+
+	thead th {
+		background: #fafafb;
+		color: var(--zoviz-muted);
+		font-size: 11px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		border-bottom: 1px solid var(--zoviz-border);
+		padding: var(--zoviz-space-3);
+	}
+
+	tbody td {
+		padding: var(--zoviz-space-3);
+		border-bottom: 1px solid var(--zoviz-border);
+		vertical-align: middle;
+	}
+
+	tbody tr:last-child td {
+		border-bottom: none;
+	}
+
+	tbody tr:hover {
+		background: #fafafe;
+	}
+
+	&.striped tbody tr:nth-child(odd) {
+		background: transparent;
+	}
+}
+
+.zoviz-status {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	background: #f0f0f3;
+	color: var(--zoviz-muted);
+
+	&.is-succeeded {
+		background: #ecfdf3;
+		color: #027a48;
+	}
+
+	&.is-failed,
+	&.is-expired {
+		background: #fef3f2;
+		color: #b42318;
+	}
+
+	&.is-running,
+	&.is-queued,
+	&.is-pending_submit {
+		background: #fffaeb;
+		color: #b54708;
+	}
+}
+
+.zoviz-jobs-pagination {
+	display: flex;
+	align-items: center;
+	gap: var(--zoviz-space-3);
+	color: var(--zoviz-muted);
+	font-size: 13px;
+}
+
+.zoviz-keys-table {
+
+	.zoviz-key-invalid {
+		color: #b42318;
+		font-weight: 500;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Media Library: server-rendered links (see Admin/MediaLibraryIntegration).
+// No React app here, so these rules apply the shared button treatment to
+// plain WP `.button`/`.button-primary` anchors.
+// ---------------------------------------------------------------------------
+.zoviz-media-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+
+	.button {
+		border-radius: 6px;
+	}
+
+	.button-primary {
+		background: #4f46e5;
+		border-color: #4338ca;
+
+		&:hover {
+			background: #4338ca;
+			border-color: #3730a3;
+		}
+	}
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.zoviz-misc-actions a {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-weight: 500;
+}
+
+// ---------------------------------------------------------------------------
+// Block editor: featured-image quick actions
+// ---------------------------------------------------------------------------
+.zoviz-featured-image-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 12px;
+	margin-top: 8px;
+
+	/* stylelint-disable-next-line no-descending-specificity */
+	.components-button {
+		padding: 0;
+		height: auto;
+		font-size: 12px;
+		color: var(--zoviz-accent, #4f46e5);
+
+		/* stylelint-disable-next-line no-descending-specificity */
+		&:hover {
+			color: var(--zoviz-accent-hover, #4338ca);
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// WooCommerce metabox
+// ---------------------------------------------------------------------------
+.zoviz-woocommerce {
+
+	.zoviz-service-nav--compact {
+		margin-bottom: 8px;
+	}
+}

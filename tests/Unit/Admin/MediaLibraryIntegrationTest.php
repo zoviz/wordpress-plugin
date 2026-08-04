@@ -12,6 +12,7 @@ use Zoviz\DeveloperApi\Services\ObjectRemoverService;
 use Zoviz\DeveloperApi\Services\ProductPhotographyService;
 use Zoviz\DeveloperApi\Services\ServiceRegistry;
 use Zoviz\DeveloperApi\Services\SketchToImageService;
+use Zoviz\Kernel\Assets;
 use Zoviz\Tests\Unit\Support\WpPost;
 use Zoviz\Tests\Unit\TestCase;
 
@@ -29,6 +30,15 @@ class MediaLibraryIntegrationTest extends TestCase {
 		return $registry;
 	}
 
+	/**
+	 * Assets is `final` and needs a booted Plugin kernel to construct
+	 * normally; none of these tests exercise enqueue(), so a Plugin-less
+	 * instance built via reflection is a fine stand-in.
+	 */
+	private function fake_assets(): Assets {
+		return ( new \ReflectionClass( Assets::class ) )->newInstanceWithoutConstructor();
+	}
+
 	private function stub_url_functions(): void {
 		Functions\when( 'admin_url' )->alias(
 			static fn( $path = '' ) => 'https://example.test/wp-admin/' . $path
@@ -41,7 +51,7 @@ class MediaLibraryIntegrationTest extends TestCase {
 	}
 
 	public function test_ineligible_mime_gets_no_row_actions() {
-		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository() );
+		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository(), $this->fake_assets() );
 
 		Functions\when( 'current_user_can' )->justReturn( true );
 		Functions\when( 'get_post_mime_type' )->justReturn( 'application/pdf' );
@@ -52,7 +62,7 @@ class MediaLibraryIntegrationTest extends TestCase {
 	}
 
 	public function test_unprivileged_user_gets_no_row_actions() {
-		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository() );
+		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository(), $this->fake_assets() );
 
 		Functions\when( 'current_user_can' )->justReturn( false );
 		Functions\when( 'get_post_mime_type' )->justReturn( 'image/png' );
@@ -63,7 +73,7 @@ class MediaLibraryIntegrationTest extends TestCase {
 	}
 
 	public function test_eligible_image_gets_quick_and_generic_row_actions() {
-		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository() );
+		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository(), $this->fake_assets() );
 
 		Functions\when( 'current_user_can' )->justReturn( true );
 		Functions\when( 'get_post_mime_type' )->justReturn( 'image/png' );
@@ -84,7 +94,7 @@ class MediaLibraryIntegrationTest extends TestCase {
 	}
 
 	public function test_attachment_field_renders_action_buttons() {
-		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository() );
+		$integration = new MediaLibraryIntegration( $this->full_registry(), new JobRepository(), $this->fake_assets() );
 
 		Functions\when( 'current_user_can' )->justReturn( true );
 		Functions\when( 'get_post_mime_type' )->justReturn( 'image/png' );

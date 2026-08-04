@@ -7,7 +7,7 @@
  */
 import { registerPlugin } from '@wordpress/plugins';
 
-import '../shared/style.scss';
+import '../shared/styles.scss';
 import './block-controls';
 import './featured-image';
 import { ZovizEditorPlugin } from './sidebar';

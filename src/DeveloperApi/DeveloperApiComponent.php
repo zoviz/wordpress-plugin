@@ -209,7 +209,8 @@ final class DeveloperApiComponent implements ComponentInterface {
 			static function ( Container $c ) {
 				return new MediaLibraryIntegration(
 					$c->get( ServiceRegistry::class ),
-					$c->get( JobRepository::class )
+					$c->get( JobRepository::class ),
+					$c->get( Assets::class )
 				);
 			}
 		);
