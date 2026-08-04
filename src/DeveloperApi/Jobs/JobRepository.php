@@ -226,6 +226,21 @@ final class JobRepository {
 	}
 
 	/**
+	 * Counts jobs whose source was a given attachment (Media Library badge).
+	 *
+	 * @param int $attachment_id Source attachment id.
+	 * @return int
+	 */
+	public function count_by_source_attachment( $attachment_id ) {
+		global $wpdb;
+
+		$table = Schema::jobs_table();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Plugin-owned table; name from a trusted constant.
+		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE source_attachment_id = %d", (int) $attachment_id ) );
+	}
+
+	/**
 	 * Deletes a job row.
 	 *
 	 * @param int $id Row id.

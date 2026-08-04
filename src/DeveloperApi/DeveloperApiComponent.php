@@ -8,6 +8,7 @@
 namespace Zoviz\DeveloperApi;
 
 use Zoviz\DeveloperApi\Admin\Menu;
+use Zoviz\DeveloperApi\Admin\MediaLibraryIntegration;
 use Zoviz\DeveloperApi\Admin\Notices;
 use Zoviz\DeveloperApi\Api\ApiClient;
 use Zoviz\DeveloperApi\Jobs\JobManager;
@@ -200,6 +201,16 @@ final class DeveloperApiComponent implements ComponentInterface {
 				return new Notices( $c->get( KeyRepository::class ) );
 			}
 		);
+
+		$container->set(
+			MediaLibraryIntegration::class,
+			static function ( Container $c ) {
+				return new MediaLibraryIntegration(
+					$c->get( ServiceRegistry::class ),
+					$c->get( JobRepository::class )
+				);
+			}
+		);
 	}
 
 	/**
@@ -224,6 +235,7 @@ final class DeveloperApiComponent implements ComponentInterface {
 
 			$container->get( Menu::class )->register();
 			$container->get( Notices::class )->register();
+			$container->get( MediaLibraryIntegration::class )->register();
 		}
 
 		// REST proxy: the browser never sees API keys.
