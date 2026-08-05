@@ -9,23 +9,24 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-04T18:24:11+00:00\n"
+"POT-Creation-Date: 2026-08-05T09:52:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: zoviz-ai-studio\n"
 
 #. Plugin Name of the plugin
 #: zoviz-ai-studio.php
-#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:83
-#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:102
+#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:108
+#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:127
 #: src/DeveloperApi/Admin/Menu.php:76
 #: src/DeveloperApi/Admin/Menu.php:77
 #: src/DeveloperApi/Admin/Menu.php:169
 #: src/DeveloperApi/Admin/WooCommerceIntegration.php:83
-#: client/editor/block-controls.js:51
-#: client/editor/sidebar.js:182
-#: client/editor/sidebar.js:269
-#: client/workspace/index.js:128
+#: client/editor/block-controls.js:55
+#: client/editor/sidebar.js:202
+#: client/editor/sidebar.js:313
+#: client/editor/text-controls.js:104
+#: client/workspace/index.js:174
 msgid "Zoviz AI Studio"
 msgstr ""
 
@@ -49,8 +50,8 @@ msgstr ""
 msgid "https://zoviz.com/"
 msgstr ""
 
-#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:125
-#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:241
+#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:150
+#: src/DeveloperApi/Admin/MediaLibraryIntegration.php:266
 msgid "Open in Zoviz AI Studio"
 msgstr ""
 
@@ -66,7 +67,7 @@ msgstr ""
 
 #: src/DeveloperApi/Admin/Menu.php:105
 #: src/DeveloperApi/Admin/Menu.php:187
-#: client/settings/index.js:331
+#: client/settings/index.js:358
 msgid "Zoviz Settings"
 msgstr ""
 
@@ -75,7 +76,7 @@ msgid "Settings"
 msgstr ""
 
 #: src/DeveloperApi/Admin/Menu.php:178
-#: client/jobs/index.js:135
+#: client/jobs/index.js:144
 msgid "Zoviz Jobs"
 msgstr ""
 
@@ -182,10 +183,6 @@ msgstr ""
 msgid "The stored API key could not be read. Please enter it again."
 msgstr ""
 
-#: src/DeveloperApi/Jobs/JobSweeper.php:86
-msgid "Every two minutes (Zoviz job sweeper)"
-msgstr ""
-
 #. translators: 1: original image title, 2: Zoviz service id.
 #: src/DeveloperApi/Media/MediaImporter.php:133
 #, php-format
@@ -199,7 +196,7 @@ msgid "Zoviz %1$s result %2$s"
 msgstr ""
 
 #: src/DeveloperApi/Rest/CreditsController.php:62
-#: src/DeveloperApi/Rest/JobsController.php:445
+#: src/DeveloperApi/Rest/JobsController.php:454
 msgid "API key id; the default key is used when omitted."
 msgstr ""
 
@@ -236,32 +233,32 @@ msgid "You are not allowed to access this job."
 msgstr ""
 
 #. translators: %s: file field name.
-#: src/DeveloperApi/Rest/JobsController.php:413
+#: src/DeveloperApi/Rest/JobsController.php:422
 #, php-format
 msgid "The \"%s\" file upload failed."
 msgstr ""
 
-#: src/DeveloperApi/Rest/JobsController.php:439
+#: src/DeveloperApi/Rest/JobsController.php:448
 msgid "The Zoviz service to run."
 msgstr ""
 
-#: src/DeveloperApi/Rest/JobsController.php:451
+#: src/DeveloperApi/Rest/JobsController.php:460
 msgid "Media Library attachment to use as the source image."
 msgstr ""
 
-#: src/DeveloperApi/Rest/JobsController.php:457
+#: src/DeveloperApi/Rest/JobsController.php:466
 msgid "The admin surface the job was started from."
 msgstr ""
 
-#: src/DeveloperApi/Rest/JobsController.php:473
+#: src/DeveloperApi/Rest/JobsController.php:482
 msgid "Statuses to filter by."
 msgstr ""
 
-#: src/DeveloperApi/Rest/JobsController.php:508
+#: src/DeveloperApi/Rest/JobsController.php:517
 msgid "Use \"all\" to list every user's jobs (administrators only)."
 msgstr ""
 
-#: src/DeveloperApi/Rest/JobsController.php:534
+#: src/DeveloperApi/Rest/JobsController.php:543
 msgid "Optionally assign the saved attachment to content."
 msgstr ""
 
@@ -408,6 +405,7 @@ msgid "Remove unwanted objects, people, or text from images. Paint over the obje
 msgstr ""
 
 #: src/DeveloperApi/Services/ProductPhotographyService.php:31
+#: client/editor/block-controls.js:28
 msgid "Product Photography"
 msgstr ""
 
@@ -461,193 +459,202 @@ msgstr ""
 msgid "Generate"
 msgstr ""
 
-#: client/editor/sidebar.js:250
-#: client/woocommerce/index.js:190
-#: client/workspace/index.js:210
+#: client/editor/sidebar.js:293
+#: client/woocommerce/index.js:195
+#: client/workspace/index.js:276
 msgid "Run"
 msgstr ""
 
-#: client/jobs/index.js:34
+#: client/editor/text-controls.js:28
+msgid "Generate Image"
+msgstr ""
+
+#: client/jobs/index.js:41
 msgid "Waiting"
 msgstr ""
 
-#: client/jobs/index.js:35
+#: client/jobs/index.js:42
 msgid "Queued"
 msgstr ""
 
-#: client/jobs/index.js:36
+#: client/jobs/index.js:43
 msgid "Running"
 msgstr ""
 
-#: client/jobs/index.js:37
+#: client/jobs/index.js:44
 msgid "Succeeded"
 msgstr ""
 
-#: client/jobs/index.js:38
+#: client/jobs/index.js:45
 msgid "Failed"
 msgstr ""
 
-#: client/jobs/index.js:39
+#: client/jobs/index.js:46
 msgid "Expired"
 msgstr ""
 
-#: client/jobs/index.js:112
+#: client/jobs/index.js:119
 msgid "Remove this job from the history? Saved images stay in the Media Library."
 msgstr ""
 
-#: client/jobs/index.js:142
+#: client/jobs/index.js:154
 msgid "Show jobs from all users"
 msgstr ""
 
-#: client/jobs/index.js:164
+#: client/jobs/index.js:176
 msgid "Service"
 msgstr ""
 
-#: client/jobs/index.js:165
-#: client/settings/index.js:133
+#: client/jobs/index.js:177
+#: client/settings/index.js:143
 msgid "Status"
 msgstr ""
 
-#: client/jobs/index.js:166
+#: client/jobs/index.js:179
 msgid "Created (UTC)"
 msgstr ""
 
-#: client/jobs/index.js:167
-#: client/settings/index.js:134
+#: client/jobs/index.js:181
+#: client/settings/index.js:144
 msgid "Credits"
 msgstr ""
 
-#: client/jobs/index.js:168
+#: client/jobs/index.js:182
 #: client/shared/components/job-runner.js:44
 msgid "Result"
 msgstr ""
 
-#: client/jobs/index.js:176
+#: client/jobs/index.js:190
 msgid "No jobs yet."
 msgstr ""
 
-#: client/jobs/index.js:199
+#: client/jobs/index.js:217
 msgid "View in Media Library"
 msgstr ""
 
-#: client/jobs/index.js:214
+#: client/jobs/index.js:226
+msgid "File manually removed"
+msgstr ""
+
+#: client/jobs/index.js:245
 msgid "Download to Media Library"
 msgstr ""
 
-#: client/jobs/index.js:221
+#: client/jobs/index.js:252
 msgid "No longer available"
 msgstr ""
 
-#: client/jobs/index.js:235
-#: client/shared/components/source-picker.js:60
+#: client/jobs/index.js:266
+#: client/shared/components/mask-canvas.js:274
+#: client/shared/components/source-picker.js:68
 msgid "Remove"
 msgstr ""
 
-#: client/jobs/index.js:249
+#: client/jobs/index.js:283
 msgid "← Newer"
 msgstr ""
 
 #. translators: %d: page number.
-#: client/jobs/index.js:254
+#: client/jobs/index.js:288
 #, js-format
 msgid "Page %d"
 msgstr ""
 
-#: client/jobs/index.js:263
+#: client/jobs/index.js:297
 msgid "Older →"
 msgstr ""
 
 #. translators: %s: API key label.
-#: client/settings/index.js:58
+#: client/settings/index.js:62
 #, js-format
 msgid "Key \"%s\" was validated and saved. It is now the default."
 msgstr ""
 
 #. translators: %s: API key label.
-#: client/settings/index.js:85
+#: client/settings/index.js:89
 #, js-format
 msgid "Delete the key \"%s\"? Jobs created with it remain in the history."
 msgstr ""
 
-#: client/settings/index.js:107
+#: client/settings/index.js:112
 msgid "API keys"
 msgstr ""
 
-#: client/settings/index.js:109
+#: client/settings/index.js:116
 msgid "Each key belongs to a Zoviz workspace and its credit balance. The most recently added key becomes the default automatically."
 msgstr ""
 
-#: client/settings/index.js:131
-#: client/settings/index.js:208
+#: client/settings/index.js:141
+#: client/settings/index.js:221
 msgid "Label"
 msgstr ""
 
-#: client/settings/index.js:132
+#: client/settings/index.js:142
 msgid "Key"
 msgstr ""
 
-#: client/settings/index.js:135
-#: client/settings/index.js:164
+#: client/settings/index.js:145
+#: client/settings/index.js:174
 msgid "Default"
 msgstr ""
 
-#: client/settings/index.js:148
+#: client/settings/index.js:158
 msgid "Valid"
 msgstr ""
 
-#: client/settings/index.js:151
+#: client/settings/index.js:161
 msgid "Invalid — please replace this key"
 msgstr ""
 
-#: client/settings/index.js:176
+#: client/settings/index.js:186
 msgid "Make default"
 msgstr ""
 
-#: client/settings/index.js:189
+#: client/settings/index.js:199
 msgid "Delete"
 msgstr ""
 
-#: client/settings/index.js:198
+#: client/settings/index.js:211
 msgid "Add a key"
 msgstr ""
 
-#: client/settings/index.js:200
+#: client/settings/index.js:213
 msgid "The key is validated against the Zoviz API before it is saved, and it is stored encrypted."
 msgstr ""
 
-#: client/settings/index.js:209
+#: client/settings/index.js:222
 msgid "For example the workspace name."
 msgstr ""
 
-#: client/settings/index.js:218
+#: client/settings/index.js:231
 msgid "API key"
 msgstr ""
 
-#: client/settings/index.js:230
+#: client/settings/index.js:245
 msgid "Validate & save"
 msgstr ""
 
-#: client/settings/index.js:268
+#: client/settings/index.js:285
 msgid "Options"
 msgstr ""
 
-#: client/settings/index.js:278
+#: client/settings/index.js:299
 msgid "Settings saved."
 msgstr ""
 
-#: client/settings/index.js:285
+#: client/settings/index.js:306
 msgid "Automatically save finished results to the Media Library"
 msgstr ""
 
-#: client/settings/index.js:289
+#: client/settings/index.js:310
 msgid "Recommended: Zoviz keeps results available for a limited time only. Saving immediately means you never lose one."
 msgstr ""
 
-#: client/settings/index.js:302
+#: client/settings/index.js:323
 msgid "Keep job history for (days)"
 msgstr ""
 
-#: client/settings/index.js:317
+#: client/settings/index.js:341
 msgid "Save settings"
 msgstr ""
 
@@ -709,20 +716,20 @@ msgstr ""
 msgid "View attachment"
 msgstr ""
 
-#: client/shared/components/job-runner.js:108
+#: client/shared/components/job-runner.js:152
 msgid "The job failed. No credits were consumed."
 msgstr ""
 
-#: client/shared/components/job-runner.js:122
+#: client/shared/components/job-runner.js:166
 msgid "This result expired before it could be downloaded."
 msgstr ""
 
-#: client/shared/components/job-runner.js:174
+#: client/shared/components/job-runner.js:207
 msgid "Save result to Media Library"
 msgstr ""
 
 #. translators: %d: number of credits.
-#: client/shared/components/job-runner.js:188
+#: client/shared/components/job-runner.js:221
 #, js-format
 msgid "This job used %d credit(s)."
 msgstr ""
@@ -731,27 +738,32 @@ msgstr ""
 msgid "Zoviz workspace"
 msgstr ""
 
-#: client/shared/components/mask-canvas.js:223
+#: client/shared/components/mask-canvas.js:228
+#: client/shared/components/sketch-canvas.js:162
 msgid "Brush"
 msgstr ""
 
-#: client/shared/components/mask-canvas.js:229
+#: client/shared/components/mask-canvas.js:234
+#: client/shared/components/sketch-canvas.js:168
 msgid "Eraser"
 msgstr ""
 
-#: client/shared/components/mask-canvas.js:234
+#: client/shared/components/mask-canvas.js:239
+#: client/shared/components/sketch-canvas.js:173
 msgid "Brush size"
 msgstr ""
 
-#: client/shared/components/mask-canvas.js:245
+#: client/shared/components/mask-canvas.js:250
+#: client/shared/components/sketch-canvas.js:184
 msgid "Undo"
 msgstr ""
 
-#: client/shared/components/mask-canvas.js:253
+#: client/shared/components/mask-canvas.js:258
+#: client/shared/components/sketch-canvas.js:192
 msgid "Clear"
 msgstr ""
 
-#: client/shared/components/mask-canvas.js:257
+#: client/shared/components/mask-canvas.js:262
 msgid "Paint over the area you want to change. The painted area is sent to Zoviz as the mask."
 msgstr ""
 
@@ -759,46 +771,50 @@ msgstr ""
 msgid "optional"
 msgstr ""
 
+#: client/shared/components/sketch-canvas.js:196
+msgid "Draw your sketch, then describe what to turn it into."
+msgstr ""
+
 #: client/shared/components/source-picker.js:27
 msgid "Select an image"
 msgstr ""
 
-#: client/shared/components/source-picker.js:78
+#: client/shared/components/source-picker.js:86
 msgid "Select from Media Library"
 msgstr ""
 
-#: client/shared/components/source-picker.js:91
+#: client/shared/components/source-picker.js:99
 msgid "Upload image"
 msgstr ""
 
-#: client/woocommerce/index.js:117
+#: client/woocommerce/index.js:120
 msgid "Set as the product image. Reload the page to see it."
 msgstr ""
 
-#: client/woocommerce/index.js:121
+#: client/woocommerce/index.js:124
 msgid "Added to the product gallery. Reload the page to see it."
 msgstr ""
 
-#: client/woocommerce/index.js:164
+#: client/woocommerce/index.js:172
 msgid "Pick from media"
 msgstr ""
 
-#: client/woocommerce/index.js:222
+#: client/woocommerce/index.js:228
 msgid "Set as product image"
 msgstr ""
 
-#: client/woocommerce/index.js:233
+#: client/woocommerce/index.js:239
 msgid "Add to gallery"
 msgstr ""
 
-#: client/workspace/index.js:142
+#: client/workspace/index.js:189
 msgid "Zoviz services"
 msgstr ""
 
-#: client/workspace/index.js:160
+#: client/workspace/index.js:208
 msgid "Pick a service to get started."
 msgstr ""
 
-#: client/workspace/index.js:212
+#: client/workspace/index.js:278
 msgid "credits"
 msgstr ""
