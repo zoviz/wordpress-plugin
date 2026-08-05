@@ -9,7 +9,9 @@
  * @property {string}  serviceId Service id to preselect.
  * @property {?Object} source    { attachmentId, url, title } or null.
  * @property {?Object} target    { type: 'block', clientId } |
- *                               { type: 'featured' } | null (insert new).
+ *                               { type: 'featured' } |
+ *                               { type: 'after-block', clientId } |
+ *                               null (insert new at the end).
  * @property {?Object} values    Scalar field values to prefill the service
  *                               form with (e.g. { prompt } from selected
  *                               text) or null.

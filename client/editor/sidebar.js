@@ -15,7 +15,7 @@ import {
 	PanelBody,
 	Spinner,
 } from '@wordpress/components';
-import { dispatch, useDispatch } from '@wordpress/data';
+import { dispatch, select, useDispatch } from '@wordpress/data';
 import {
 	PluginSidebar,
 	PluginSidebarMoreMenuItem,
@@ -117,8 +117,9 @@ function ZovizSidebarBody() {
 
 	// Applies a finished job the way the request that opened the sidebar
 	// asked for: replace the source block's image, set the featured
-	// image, or — opened directly from the sidebar menu — insert a new
-	// standard core/image block.
+	// image, drop the new image right after the block the prompt text
+	// came from, or — opened directly from the sidebar menu — insert a
+	// new standard core/image block at the end.
 	const applyResult = ( job ) => {
 		if ( ! job || ! job.attachment_id ) {
 			return;
@@ -137,12 +138,26 @@ function ZovizSidebarBody() {
 			return;
 		}
 
-		insertBlocks(
-			createBlock( 'core/image', {
-				id: job.attachment_id,
-				url: job.attachment_url,
-			} )
-		);
+		const imageBlock = createBlock( 'core/image', {
+			id: job.attachment_id,
+			url: job.attachment_url,
+		} );
+
+		if ( target && 'after-block' === target.type && target.clientId ) {
+			const { getBlockIndex, getBlockRootClientId } =
+				select( blockEditorStore );
+			const index = getBlockIndex( target.clientId );
+			const rootClientId = getBlockRootClientId( target.clientId );
+
+			insertBlocks(
+				imageBlock,
+				index === -1 ? undefined : index + 1,
+				rootClientId
+			);
+			return;
+		}
+
+		insertBlocks( imageBlock );
 	};
 
 	const submit = async () => {
