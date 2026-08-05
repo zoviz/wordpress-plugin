@@ -780,7 +780,7 @@ msgid "Added to the product gallery. Reload the page to see it."
 msgstr ""
 
 #: client/woocommerce/index.js:164
-msgid "Use a different image"
+msgid "Pick from media"
 msgstr ""
 
 #: client/woocommerce/index.js:222

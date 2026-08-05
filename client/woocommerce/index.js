@@ -170,7 +170,7 @@ function WooProductApp() {
 							source={ source }
 							onChange={ setSource }
 							label={ __(
-								'Use a different image',
+								'Pick from media',
 								'zoviz-ai-studio'
 							) }
 						/>
