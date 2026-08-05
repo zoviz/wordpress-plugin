@@ -514,8 +514,27 @@ a.zoviz-credit-badge.is-error {
 // WooCommerce metabox
 // ---------------------------------------------------------------------------
 .zoviz-woocommerce {
+	// Mirrors .zoviz-workspace__panel: without it, elements stacked directly
+	// in this container (description, form, Run button, result…) sit flush
+	// against one another with no breathing room.
+	> * + * {
+		margin-top: var(--zoviz-space-4);
+	}
 
 	.zoviz-service-nav--compact {
 		margin-bottom: 8px;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Block editor sidebar panel
+// ---------------------------------------------------------------------------
+.zoviz-editor-sidebar {
+	// Same child spacing as .zoviz-workspace__panel/.zoviz-woocommerce.
+	// PanelBody puts `className` directly on the div it renders its
+	// children into (no separate body-content wrapper), so this can
+	// target its own children directly.
+	> * + * {
+		margin-top: var(--zoviz-space-4);
 	}
 }
