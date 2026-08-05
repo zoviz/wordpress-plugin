@@ -36,7 +36,16 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          if [ "$EVENT_NAME" = "push" ] && [[ "$COMMIT_MESSAGE" == *"(#"*")" ]]; then
+          # GitHub's squash-merge message is the PR title followed by " (#N)"
+          # on its own first line, then the PR body / "Co-authored-by:"
+          # trailers on the lines after — so the "(#N)" suffix sits at the
+          # end of the *subject* line, not at the end of the whole
+          # (multi-line) message. Matching against the full message for a
+          # trailing ")" never matched once a trailer followed, so the gate
+          # silently never skipped a single real squash merge. Check only
+          # the first line, anchored.
+          subject="${COMMIT_MESSAGE%%$'\n'*}"
+          if [ "$EVENT_NAME" = "push" ] && [[ "$subject" =~ \(#[0-9]+\)$ ]]; then
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
