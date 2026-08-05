@@ -14,6 +14,7 @@ const OVERLAY = 'rgba(233, 30, 99, 0.55)'; // Display-only tint; export is white
 export function MaskCanvas( {
 	imageUrl,
 	onMaskChange,
+	onRemoveSource,
 	defaultBrushSize = 40,
 } ) {
 	const displayRef = useRef( null );
@@ -263,6 +264,16 @@ export function MaskCanvas( {
 					'zoviz-ai-studio'
 				) }
 			</p>
+			{ !! onRemoveSource && (
+				<Button
+					variant="tertiary"
+					isDestructive
+					className="zoviz-mask-canvas__remove"
+					onClick={ onRemoveSource }
+				>
+					{ __( 'Remove', 'zoviz-ai-studio' ) }
+				</Button>
+			) }
 			<canvas
 				ref={ displayRef }
 				className="zoviz-mask-canvas__surface"

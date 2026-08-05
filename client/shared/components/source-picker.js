@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 
 const ACCEPT = 'image/jpeg,image/png,image/webp';
 
-export function SourcePicker( { source, onChange, label } ) {
+export function SourcePicker( { source, onChange, label, hidePreview } ) {
 	const pickFile = ( file ) => {
 		if ( ! file ) {
 			return;
@@ -46,6 +46,14 @@ export function SourcePicker( { source, onChange, label } ) {
 
 		frame.open();
 	};
+
+	// When a mask painter is also showing the same image (needs-mask
+	// services), skip this preview entirely rather than displaying the
+	// source image twice — the mask canvas below shows it, and gets its
+	// own "Remove" control instead.
+	if ( hidePreview && source && source.url ) {
+		return null;
+	}
 
 	return (
 		<div className="zoviz-source-picker">

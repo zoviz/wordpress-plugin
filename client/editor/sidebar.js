@@ -252,6 +252,7 @@ function ZovizSidebarBody() {
 									setMask( null );
 									setJobId( 0 );
 								} }
+								hidePreview={ needsMask }
 							/>
 						) }
 
@@ -259,6 +260,11 @@ function ZovizSidebarBody() {
 							<MaskCanvas
 								imageUrl={ source.url }
 								onMaskChange={ setMask }
+								onRemoveSource={ () => {
+									setSource( null );
+									setMask( null );
+									setJobId( 0 );
+								} }
 								defaultBrushSize={
 									service.id === 'image-editor' ? 10 : 40
 								}

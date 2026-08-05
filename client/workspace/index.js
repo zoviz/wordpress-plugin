@@ -235,6 +235,7 @@ export function WorkspaceApp() {
 										setMask( null );
 										setJobId( 0 );
 									} }
+									hidePreview={ needsMask }
 								/>
 							) }
 
@@ -242,6 +243,11 @@ export function WorkspaceApp() {
 								<MaskCanvas
 									imageUrl={ source.url }
 									onMaskChange={ setMask }
+									onRemoveSource={ () => {
+										setSource( null );
+										setMask( null );
+										setJobId( 0 );
+									} }
 									defaultBrushSize={
 										service.id === 'image-editor' ? 10 : 40
 									}
