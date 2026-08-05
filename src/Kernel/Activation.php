@@ -24,7 +24,8 @@ final class Activation {
 		/**
 		 * Fires on plugin activation, after core setup.
 		 *
-		 * Components use this to install schema and schedule cron events.
+		 * Components use this to install schema and clear any stale
+		 * scheduled state left behind by a previous version.
 		 *
 		 * @since 0.1.0
 		 */
@@ -40,7 +41,7 @@ final class Activation {
 		/**
 		 * Fires on plugin deactivation.
 		 *
-		 * Components use this to unschedule their cron events.
+		 * Components use this to unschedule any legacy cron events.
 		 *
 		 * @since 0.1.0
 		 */

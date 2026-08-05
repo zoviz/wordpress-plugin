@@ -96,22 +96,41 @@ class JobSweeperTest extends \WP_UnitTestCase {
 		$this->assertNull( $this->repository->find( $id ) );
 	}
 
-	public function test_cron_events_schedule_and_unschedule() {
-		JobSweeper::schedule();
+	public function test_maybe_run_fires_each_hook_once_per_window() {
+		$sweep_calls = 0;
+		$prune_calls = 0;
 
-		$this->assertNotFalse( wp_next_scheduled( JobSweeper::HOOK_SWEEP ) );
-		$this->assertNotFalse( wp_next_scheduled( JobSweeper::HOOK_PRUNE ) );
+		add_action(
+			JobSweeper::HOOK_SWEEP,
+			static function () use ( &$sweep_calls ) {
+				++$sweep_calls;
+			}
+		);
+		add_action(
+			JobSweeper::HOOK_PRUNE,
+			static function () use ( &$prune_calls ) {
+				++$prune_calls;
+			}
+		);
 
-		JobSweeper::unschedule();
+		// A second, immediate call (as if a concurrent admin request hit
+		// admin_init at the same time) must not fire either hook again.
+		JobSweeper::maybe_run();
+		JobSweeper::maybe_run();
+
+		$this->assertSame( 1, $sweep_calls );
+		$this->assertSame( 1, $prune_calls );
+	}
+
+	public function test_unschedule_legacy_cron_clears_stale_events() {
+		// Simulates state left behind by a pre-admin-only version of the
+		// plugin, which scheduled these as real WP-Cron events.
+		wp_schedule_event( time() + MINUTE_IN_SECONDS, 'hourly', JobSweeper::HOOK_SWEEP );
+		wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', JobSweeper::HOOK_PRUNE );
+
+		JobSweeper::unschedule_legacy_cron();
 
 		$this->assertFalse( wp_next_scheduled( JobSweeper::HOOK_SWEEP ) );
 		$this->assertFalse( wp_next_scheduled( JobSweeper::HOOK_PRUNE ) );
-	}
-
-	public function test_custom_cron_interval_is_registered() {
-		$schedules = wp_get_schedules();
-
-		$this->assertArrayHasKey( JobSweeper::INTERVAL_SWEEP, $schedules );
-		$this->assertSame( 2 * MINUTE_IN_SECONDS, $schedules[ JobSweeper::INTERVAL_SWEEP ]['interval'] );
 	}
 }

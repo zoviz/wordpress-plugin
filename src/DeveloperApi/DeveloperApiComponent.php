@@ -237,18 +237,37 @@ final class DeveloperApiComponent implements ComponentInterface {
 	 * @return void
 	 */
 	public function boot( Container $container ) {
-		// Schema lifecycle.
+		// Schema lifecycle. JobSweeper no longer schedules real WP-Cron
+		// events (see JobSweeper::maybe_run()); clearing legacy ones on
+		// both ends covers fresh installs and in-place upgrades alike.
 		add_action(
 			'zoviz_activate',
 			static function () {
 				Schema::install();
-				JobSweeper::schedule();
+				JobSweeper::unschedule_legacy_cron();
 			}
 		);
-		add_action( 'zoviz_deactivate', array( JobSweeper::class, 'unschedule' ) );
+		add_action( 'zoviz_deactivate', array( JobSweeper::class, 'unschedule_legacy_cron' ) );
 
 		if ( is_admin() ) {
 			add_action( 'admin_init', array( Schema::class, 'maybe_upgrade' ) );
+
+			// Cron sweeper (backstop for jobs the browser stopped
+			// polling). Deliberately admin_init, not real WP-Cron: this
+			// is what keeps it from ever running off public traffic.
+			add_action( 'admin_init', array( JobSweeper::class, 'maybe_run' ) );
+			add_action(
+				JobSweeper::HOOK_SWEEP,
+				static function () use ( $container ) {
+					$container->get( JobSweeper::class )->sweep();
+				}
+			);
+			add_action(
+				JobSweeper::HOOK_PRUNE,
+				static function () use ( $container ) {
+					$container->get( JobSweeper::class )->prune();
+				}
+			);
 
 			$container->get( Menu::class )->register();
 			$container->get( Notices::class )->register();
@@ -258,7 +277,7 @@ final class DeveloperApiComponent implements ComponentInterface {
 			if ( class_exists( 'WooCommerce' ) ) {
 				$container->get( WooCommerceIntegration::class )->register();
 			}
-		}
+		}//end if
 
 		// REST proxy: the browser never sees API keys.
 		add_action(
@@ -280,21 +299,6 @@ final class DeveloperApiComponent implements ComponentInterface {
 				foreach ( $controllers as $controller ) {
 					$controller->register_routes();
 				}
-			}
-		);
-
-		// Cron sweeper (backstop for jobs the browser stopped polling).
-		add_filter( 'cron_schedules', array( JobSweeper::class, 'add_interval' ) ); // phpcs:ignore WordPress.WP.CronInterval.ChangeDetected -- Interval is 2 minutes (JobSweeper::add_interval); intentional, the sweeper is time-boxed and light.
-		add_action(
-			JobSweeper::HOOK_SWEEP,
-			static function () use ( $container ) {
-				$container->get( JobSweeper::class )->sweep();
-			}
-		);
-		add_action(
-			JobSweeper::HOOK_PRUNE,
-			static function () use ( $container ) {
-				$container->get( JobSweeper::class )->prune();
 			}
 		);
 	}

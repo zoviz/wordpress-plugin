@@ -14,17 +14,28 @@ use Zoviz\DeveloperApi\Settings;
  * (which auto-downloads succeeded results into the Media Library before
  * the remote copy expires), marks expired results, and prunes old rows.
  *
- * Browser-side polling is the primary finalizer — WP-Cron only fires on
- * traffic, so this is deliberately a safety net, time-boxed per run.
+ * Browser-side polling is the primary finalizer. This backstop is
+ * deliberately admin-only: `maybe_run()` is hooked to `admin_init`, never
+ * to real WP-Cron, so it only ever runs as a side effect of someone
+ * visiting wp-admin — a public front-end pageview never triggers it. A
+ * pair of short-lived transients throttle it to once per interval, per
+ * hook, and double as a lock against concurrent admin requests.
  */
 final class JobSweeper {
 
 	/**
-	 * Cron hook names and the custom interval id.
+	 * Cron-style hook names the sweep/prune work is fired through. No real
+	 * WP-Cron event is ever scheduled against these — `maybe_run()` calls
+	 * `do_action()` on them directly from `admin_init`.
 	 */
-	const HOOK_SWEEP     = 'zoviz_sweep_jobs';
-	const HOOK_PRUNE     = 'zoviz_prune_jobs';
-	const INTERVAL_SWEEP = 'zoviz_two_minutes';
+	const HOOK_SWEEP = 'zoviz_sweep_jobs';
+	const HOOK_PRUNE = 'zoviz_prune_jobs';
+
+	/**
+	 * Transient keys used to throttle/lock the admin-triggered runs.
+	 */
+	const LOCK_SWEEP = 'zoviz_sweep_lock';
+	const LOCK_PRUNE = 'zoviz_prune_lock';
 
 	/**
 	 * Maximum jobs refreshed per sweep run.
@@ -75,41 +86,34 @@ final class JobSweeper {
 	}
 
 	/**
-	 * Adds the custom cron interval.
-	 *
-	 * @param array<string, array<string, mixed>> $schedules Registered schedules.
-	 * @return array<string, array<string, mixed>>
-	 */
-	public static function add_interval( $schedules ) {
-		$schedules[ self::INTERVAL_SWEEP ] = array(
-			'interval' => 2 * MINUTE_IN_SECONDS,
-			'display'  => __( 'Every two minutes (Zoviz job sweeper)', 'zoviz-ai-studio' ),
-		);
-
-		return $schedules;
-	}
-
-	/**
-	 * Schedules the cron events (activation).
+	 * Fires the sweep/prune hooks, throttled to once per interval and
+	 * locked against concurrent runs, via a pair of transients. Hooked to
+	 * `admin_init` only — this is what makes the backstop admin-only.
 	 *
 	 * @return void
 	 */
-	public static function schedule() {
-		if ( ! wp_next_scheduled( self::HOOK_SWEEP ) ) {
-			wp_schedule_event( time() + MINUTE_IN_SECONDS, self::INTERVAL_SWEEP, self::HOOK_SWEEP );
+	public static function maybe_run() {
+		if ( false === get_transient( self::LOCK_SWEEP ) ) {
+			set_transient( self::LOCK_SWEEP, 1, 2 * MINUTE_IN_SECONDS );
+			do_action( self::HOOK_SWEEP ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- HOOK_SWEEP is the 'zoviz_sweep_jobs' constant; the sniff can't resolve it through self::.
 		}
 
-		if ( ! wp_next_scheduled( self::HOOK_PRUNE ) ) {
-			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::HOOK_PRUNE );
+		if ( false === get_transient( self::LOCK_PRUNE ) ) {
+			set_transient( self::LOCK_PRUNE, 1, DAY_IN_SECONDS );
+			do_action( self::HOOK_PRUNE ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- HOOK_PRUNE is the 'zoviz_prune_jobs' constant; the sniff can't resolve it through self::.
 		}
 	}
 
 	/**
-	 * Unschedules the cron events (deactivation).
+	 * Clears any real WP-Cron events a pre-admin-only version of this
+	 * plugin may have scheduled. Safe to call even if none were ever
+	 * scheduled; run on both activation and deactivation so neither a
+	 * fresh install nor an in-place upgrade is left with a stray
+	 * perpetually-rescheduling event.
 	 *
 	 * @return void
 	 */
-	public static function unschedule() {
+	public static function unschedule_legacy_cron() {
 		wp_clear_scheduled_hook( self::HOOK_SWEEP );
 		wp_clear_scheduled_hook( self::HOOK_PRUNE );
 	}

@@ -80,11 +80,11 @@ future component follows.
   default).
 - **Jobs/** — `JobRepository` is the only place besides `Schema` allowed to
   touch `$wpdb` for the jobs table. `JobManager` is the single orchestrator
-  used by both REST and cron: submit, poll, and download-to-media. Browser
-  polling is the primary finalizer for a job; `JobSweeper`'s cron sweep is
-  the backstop for abandoned jobs (WP-Cron is not reliable — see
-  [release-process.md](release-process.md) for the recommended system-cron
-  note, and the FAQ in `readme.txt`).
+  used by both REST and the sweeper: submit, poll, and download-to-media.
+  Browser polling is the primary finalizer for a job; `JobSweeper`'s sweep
+  is the backstop for abandoned jobs, fired from `admin_init` (not real
+  WP-Cron) so it only ever runs off admin traffic — see
+  [release-process.md](release-process.md) for the trade-off that implies.
 - **Media/** — `MediaImporter` sideloads a downloaded result as a **new**
   Media Library attachment (originals are never touched), tags it with
   provenance meta, and assigns it to a target (featured image, WooCommerce

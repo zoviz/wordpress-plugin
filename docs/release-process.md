@@ -70,11 +70,10 @@ rather than as its own workflow listening for a release event.
 pre-flight check, or for `WordPress/plugin-check-action` in CI) without
 touching git tags, GitHub, or SVN.
 
-## WordPress.org listing assets — not yet added
+## WordPress.org listing assets
 
 `assets.yml` syncs `.wordpress-org/**` to the plugin's SVN `assets/` folder
-whenever it changes on `main`, independently of a release. **That
-directory doesn't exist in this repository yet** — real banner/icon/
+whenever it changes on `main`, independently of a release. real banner/icon/
 screenshot artwork is needed before the plugin is submittable. When it's
 ready, add (all PNG unless noted):
 
@@ -91,11 +90,15 @@ Don't add a stray README or any non-asset file inside `.wordpress-org/` —
 `assets.yml` mirrors the directory's contents straight to the public SVN
 `assets/` folder.
 
-## A note on WP-Cron
+## A note on the jobs sweeper
 
-The jobs sweeper (`JobSweeper`) relies on WP-Cron, which only fires on
-front-end traffic and is not reliable on low-traffic sites. Browser polling
-is the primary way a job's status is finalized; the sweeper is only a
-backstop for abandoned jobs (tab closed mid-job). Sites with infrequent
-traffic should consider a real system cron hitting `wp-cron.php`, per the
-[WordPress documentation on alternate cron](https://developer.wordpress.org/plugins/cron/hooking-wp-cron-into-the-system-task-scheduler/).
+The jobs sweeper (`JobSweeper`) is a backstop for abandoned jobs (browser
+tab closed mid-job) — browser polling is the primary way a job's status is
+finalized. `JobSweeper::maybe_run()` is hooked to `admin_init` only, not to
+real WP-Cron, so it deliberately never runs off public front-end traffic;
+a pair of transients throttle it to once per interval. The trade-off is the
+mirror image of the usual WP-Cron caveat: a site nobody visits in
+`wp-admin` for a while won't have abandoned jobs swept until someone does.
+A real system cron hitting `wp-cron.php` does **not** help here — there's
+no WP-Cron event to trigger — so there's nothing to configure for this on
+low-traffic sites.
