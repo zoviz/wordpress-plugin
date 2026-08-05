@@ -25,8 +25,18 @@ jobs:
       # suffix and still runs CI normally, same as `pull_request` and
       # `workflow_call` (release.yml) events.
       - id: check
+        # The commit message is passed via `env:` rather than interpolated
+        # directly into the script — GitHub substitutes `${{ }}` expressions
+        # into the raw script text before the shell parses it, so a message
+        # containing shell metacharacters (quotes, backticks, `>`, `$(...)`)
+        # breaks the script or, worse, gets executed. An env var is set
+        # without shell-parsing its content, so it's safe regardless of
+        # what's in the message.
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.event.head_commit.message }}" == *"(#"*")" ]]; then
+          if [ "$EVENT_NAME" = "push" ] && [[ "$COMMIT_MESSAGE" == *"(#"*")" ]]; then
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
