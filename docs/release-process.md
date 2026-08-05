@@ -72,10 +72,14 @@ touching git tags, GitHub, or SVN.
 
 ## WordPress.org listing assets
 
-`assets.yml` syncs `.wordpress-org/**` to the plugin's SVN `assets/` folder
-whenever it changes on `main`, independently of a release. real banner/icon/
-screenshot artwork is needed before the plugin is submittable. When it's
-ready, add (all PNG unless noted):
+`assets.yml` syncs `.wordpress-org/**` to the plugin's SVN `assets/` folder.
+Like `release.yml`, it is **manual dispatch only** — merging changes to
+`.wordpress-org/**` or `readme.txt` on `main` never pushes anything by
+itself; go to **Actions → assets.yml** and click **Run workflow** when
+you're ready to publish the updated listing assets. This is independent of
+a release — plugin listing assets can update without shipping a new plugin
+version. real banner/icon/screenshot artwork is needed before the plugin is
+submittable. When it's ready, add (all PNG unless noted):
 
 | File | Size | Notes |
 |---|---|---|

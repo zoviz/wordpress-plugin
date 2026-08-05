@@ -1,14 +1,12 @@
 name: WordPress.org Assets
 
-# Syncs banner/icon/screenshots (and readme.txt) to the wp.org SVN `assets`
-# directory whenever they change on main. This is independent of a release
-# — plugin listing assets can update without shipping a new plugin version.
+# Manual dispatch only — pushing/merging to main never syncs anything to
+# wp.org. Syncs banner/icon/screenshots (and readme.txt) to the wp.org SVN
+# `assets` directory on demand. This is independent of a release — plugin
+# listing assets can update without shipping a new plugin version — but it
+# still requires a human to decide *when*, same as release.yml.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.wordpress-org/**'
-      - 'readme.txt'
+  workflow_dispatch: {}
 
 concurrency:
   group: assets-${{ github.workflow }}
