@@ -169,10 +169,7 @@ function WooProductApp() {
 						<SourcePicker
 							source={ source }
 							onChange={ setSource }
-							label={ __(
-								'Pick from media',
-								'zoviz-ai-studio'
-							) }
+							label={ __( 'Pick from media', 'zoviz-ai-studio' ) }
 						/>
 					) }
 

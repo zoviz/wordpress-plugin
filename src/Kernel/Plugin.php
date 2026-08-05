@@ -124,8 +124,6 @@ final class Plugin {
 		} else {
 			add_action( 'plugins_loaded', array( $this, 'setup_components' ), 5 );
 		}
-
-		add_action( 'init', array( $this, 'load_textdomain' ) );
 	}
 
 	/**
@@ -158,19 +156,6 @@ final class Plugin {
 		 * @param Plugin $plugin The plugin kernel.
 		 */
 		do_action( 'zoviz_booted', $this );
-	}
-
-	/**
-	 * Loads the plugin text domain.
-	 *
-	 * @return void
-	 */
-	public function load_textdomain() {
-		load_plugin_textdomain(
-			'zoviz-ai-studio',
-			false,
-			dirname( plugin_basename( $this->file ) ) . '/languages'
-		);
 	}
 
 	/**

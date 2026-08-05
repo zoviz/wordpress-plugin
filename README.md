@@ -5,7 +5,12 @@ generate, edit, and enhance images with Zoviz AI services — background
 removal, image generation, upscaling, object removal, product photography,
 sketch-to-image, and AI image editing — right where you work with images.
 
-> Development happens here; releases are distributed through the
+> **Beta:** this plugin is still in development and has not had a stable
+> release yet. Expect rough edges. Feature requests are welcome — please
+> [open an issue](https://github.com/zoviz/wordpress-plugin/issues) to
+> suggest one.
+
+> Development happens here; releases will be distributed through the
 > [WordPress.org plugin directory](https://wordpress.org/plugins/zoviz-ai-studio/).
 
 ## Requirements
