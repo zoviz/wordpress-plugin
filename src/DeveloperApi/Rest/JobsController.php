@@ -245,8 +245,8 @@ final class JobsController extends RestController {
 
 		$response = new \WP_REST_Response(
 			array_map(
-				static function ( Job $job ) {
-					return $job->to_array();
+				function ( Job $job ) {
+					return $this->with_attachment_info( $job->to_array() );
 				},
 				$result['jobs']
 			)
@@ -375,15 +375,24 @@ final class JobsController extends RestController {
 	}
 
 	/**
-	 * Adds attachment URL info to a job payload.
+	 * Adds attachment URL/existence info to a job payload.
+	 *
+	 * `attachment_exists` reflects the WordPress database only (whether the
+	 * attachment post row is still there), so a client that deleted the
+	 * attachment (via the Media Library, WP-CLI, etc.) is reported
+	 * accurately even though the plugin's own job pruning never removes
+	 * attachments.
 	 *
 	 * @param array<string, mixed> $data Job payload.
 	 * @return array<string, mixed>
 	 */
 	private function with_attachment_info( array $data ) {
 		if ( ! empty( $data['attachment_id'] ) ) {
-			$data['attachment_url']  = wp_get_attachment_url( (int) $data['attachment_id'] );
-			$data['attachment_edit'] = get_edit_post_link( (int) $data['attachment_id'], 'raw' );
+			$attachment_id = (int) $data['attachment_id'];
+
+			$data['attachment_exists'] = 'attachment' === get_post_type( $attachment_id );
+			$data['attachment_url']    = $data['attachment_exists'] ? wp_get_attachment_url( $attachment_id ) : '';
+			$data['attachment_edit']   = $data['attachment_exists'] ? get_edit_post_link( $attachment_id, 'raw' ) : '';
 		}
 
 		return $data;

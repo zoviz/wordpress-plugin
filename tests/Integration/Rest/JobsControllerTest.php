@@ -152,6 +152,33 @@ class JobsControllerTest extends RestTestCase {
 		$this->assertArrayHasKey( 'attachment_url', $response->get_data() );
 	}
 
+	public function test_attachment_exists_reflects_manual_deletion() {
+		$data = $this->submit_job_as( $this->author_id );
+
+		$this->queue_zoviz_fixture( 200, 'job-succeeded.json' );
+		$this->queue_zoviz_binary( 'result-1px.png', 'image/png' );
+
+		$response      = $this->request( 'GET', '/jobs/' . $data['id'] );
+		$attachment_id = $response->get_data()['attachment_id'];
+
+		$this->assertTrue( $response->get_data()['attachment_exists'] );
+		$this->assertNotSame( '', $response->get_data()['attachment_url'] );
+
+		// The Media Library entry gets deleted out-of-band (not via pruning).
+		wp_delete_attachment( $attachment_id, true );
+
+		$response = $this->request( 'GET', '/jobs/' . $data['id'], array( 'refresh' => false ) );
+
+		$this->assertFalse( $response->get_data()['attachment_exists'] );
+		$this->assertSame( '', $response->get_data()['attachment_url'] );
+		$this->assertSame( '', $response->get_data()['attachment_edit'] );
+
+		// The list endpoint reports the same, deleted-attachment state.
+		$list = $this->request( 'GET', '/jobs' );
+
+		$this->assertFalse( $list->get_data()[0]['attachment_exists'] );
+	}
+
 	public function test_get_item_denies_non_owner() {
 		$data = $this->submit_job_as( $this->author_id );
 

@@ -209,16 +209,26 @@ function JobsApp() {
 									<td>{ job.created_at }</td>
 									<td>{ job.credits_used ?? '—' }</td>
 									<td>
-										{ job.attachment_id > 0 && (
-											<a
-												href={ `${ window.location.origin }/wp-admin/post.php?post=${ job.attachment_id }&action=edit` }
-											>
-												{ __(
-													'View in Media Library',
-													'zoviz-ai-studio'
-												) }
-											</a>
-										) }
+										{ job.attachment_id > 0 &&
+											job.attachment_exists !== false && (
+												<a
+													href={ `${ window.location.origin }/wp-admin/post.php?post=${ job.attachment_id }&action=edit` }
+												>
+													{ __(
+														'View in Media Library',
+														'zoviz-ai-studio'
+													) }
+												</a>
+											) }
+										{ job.attachment_id > 0 &&
+											job.attachment_exists === false && (
+												<span className="description">
+													{ __(
+														'File manually removed',
+														'zoviz-ai-studio'
+													) }
+												</span>
+											) }
 										{ ! job.attachment_id &&
 											job.status === 'succeeded' &&
 											( job.downloadable ? (
