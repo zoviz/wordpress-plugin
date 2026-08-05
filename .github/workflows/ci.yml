@@ -11,8 +11,31 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  should-run:
+    name: Determine whether to run CI
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      # A squash-merged PR lands on main as a single push whose commit
+      # message GitHub suffixes "(#<PR number>)" by default — and that PR
+      # already ran this exact suite via the `pull_request` trigger before
+      # it was allowed to merge. Re-running on that push is redundant, so
+      # skip it. A direct push to main (no PR, e.g. a hotfix) has no such
+      # suffix and still runs CI normally, same as `pull_request` and
+      # `workflow_call` (release.yml) events.
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.event.head_commit.message }}" == *"(#"*")" ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
   php-lint:
     name: PHP lint & static analysis
+    needs: should-run
+    if: needs.should-run.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +52,8 @@ jobs:
 
   php-unit:
     name: PHP unit (PHP ${{ matrix.php }})
+    needs: should-run
+    if: needs.should-run.outputs.run == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -46,6 +71,8 @@ jobs:
 
   php-integration:
     name: PHP integration (WP ${{ matrix.wp }}, PHP ${{ matrix.php }})
+    needs: should-run
+    if: needs.should-run.outputs.run == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -83,6 +110,8 @@ jobs:
 
   js:
     name: JS lint, test & build
+    needs: should-run
+    if: needs.should-run.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -102,6 +131,8 @@ jobs:
 
   i18n:
     name: POT freshness
+    needs: should-run
+    if: needs.should-run.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -131,6 +162,8 @@ jobs:
 
   plugin-check:
     name: WordPress Plugin Check
+    needs: should-run
+    if: needs.should-run.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
