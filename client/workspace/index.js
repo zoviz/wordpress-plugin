@@ -76,6 +76,7 @@ export function WorkspaceApp() {
 	const [ jobId, setJobId ] = useState( 0 );
 	const [ submitError, setSubmitError ] = useState( null );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
+	const [ isJobRunning, setIsJobRunning ] = useState( false );
 
 	// Deep link: preload an attachment passed by another surface.
 	useEffect( () => {
@@ -122,6 +123,7 @@ export function WorkspaceApp() {
 	const canSubmit =
 		!! service &&
 		! isSubmitting &&
+		! isJobRunning &&
 		scalarFieldsComplete( service, values ) &&
 		( ! needsSource || !! source ) &&
 		( ! needsMask || !! mask );
@@ -262,7 +264,7 @@ export function WorkspaceApp() {
 							<Button
 								variant="primary"
 								disabled={ ! canSubmit }
-								isBusy={ isSubmitting }
+								isBusy={ isSubmitting || isJobRunning }
 								onClick={ submit }
 							>
 								{ __( 'Run', 'zoviz-ai-studio' ) }
@@ -277,6 +279,7 @@ export function WorkspaceApp() {
 							<JobRunner
 								jobId={ jobId }
 								sourceUrl={ source ? source.url : null }
+								onBusyChange={ setIsJobRunning }
 							/>
 						</>
 					) }

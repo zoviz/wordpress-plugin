@@ -70,6 +70,7 @@ function ZovizSidebarBody() {
 	const [ target, setTarget ] = useState( null );
 	const [ submitError, setSubmitError ] = useState( null );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
+	const [ isJobRunning, setIsJobRunning ] = useState( false );
 
 	const { insertBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
@@ -111,6 +112,7 @@ function ZovizSidebarBody() {
 	const canSubmit =
 		!! service &&
 		! isSubmitting &&
+		! isJobRunning &&
 		scalarFieldsComplete( service, values ) &&
 		( ! needsSource || !! source ) &&
 		( ! needsMask || !! mask );
@@ -279,7 +281,7 @@ function ZovizSidebarBody() {
 						<Button
 							variant="primary"
 							disabled={ ! canSubmit }
-							isBusy={ isSubmitting }
+							isBusy={ isSubmitting || isJobRunning }
 							onClick={ submit }
 						>
 							{ __( 'Run', 'zoviz-ai-studio' ) }
@@ -289,6 +291,7 @@ function ZovizSidebarBody() {
 							jobId={ jobId }
 							sourceUrl={ source ? source.url : null }
 							onFinished={ applyResult }
+							onBusyChange={ setIsJobRunning }
 						/>
 					</>
 				) }

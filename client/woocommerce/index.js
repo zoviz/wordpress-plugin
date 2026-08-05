@@ -53,6 +53,7 @@ function WooProductApp() {
 	const [ jobId, setJobId ] = useState( 0 );
 	const [ submitError, setSubmitError ] = useState( null );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
+	const [ isJobRunning, setIsJobRunning ] = useState( false );
 	const [ assignError, setAssignError ] = useState( null );
 	const [ assignNotice, setAssignNotice ] = useState( '' );
 
@@ -78,6 +79,7 @@ function WooProductApp() {
 	const canSubmit =
 		!! service &&
 		! isSubmitting &&
+		! isJobRunning &&
 		scalarFieldsComplete( service, values ) &&
 		( ! needsSource || !! source );
 
@@ -190,7 +192,7 @@ function WooProductApp() {
 					<Button
 						variant="primary"
 						disabled={ ! canSubmit }
-						isBusy={ isSubmitting }
+						isBusy={ isSubmitting || isJobRunning }
 						onClick={ submit }
 					>
 						{ __( 'Run', 'zoviz-ai-studio' ) }
@@ -216,6 +218,7 @@ function WooProductApp() {
 					<JobRunner
 						jobId={ jobId }
 						sourceUrl={ source ? source.url : null }
+						onBusyChange={ setIsJobRunning }
 						extraActions={
 							!! product.id && (
 								<Flex gap={ 2 }>
